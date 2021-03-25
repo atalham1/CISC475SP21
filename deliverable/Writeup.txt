@@ -1,0 +1,95 @@
+Logic Gate Simulator
+Write-up
+
+Part I - What is working
+    On the web-page:
+        play button (play functionality limited; see code comments)
+        stop button
+        delete button
+        move button
+        wire button  (button works not wires fully see code comments and Part II)
+        
+        All gate buttons, positive input, zero input, led output buttons
+
+        Click a button to select a gate to place. Click the grid to place it.
+        Click the 'move' button to be able to drag a gate around.
+        Click the 'delete' button, then click a gate to remove it.
+        Click 'wire' button, then click on the grid and drag across to draw wire.
+        Click 'play' button to simulate current 
+            (requires only 1 LED output on grid. Output is printed to console(inspect element).
+             Connect the LED to what you want to see the resulting output of. See code comments
+             for more info.)
+        Click 'stop' button to stop current/simulation
+
+    Not on web page:
+        Save 'nodes' set to JSON file.
+
+
+Part II - What doesn't work / not implemented (See code comments for details)
+    Save & Load - button and interface for web page
+    Load function
+    Wires:
+        moving, deleting, carrying signal
+    Button (circuit piece)
+    Switch
+    Two-Pole-Switch
+    Alternating input
+    Display digit
+    Labels
+    Auto Grading
+    Possible connection with moodle
+    Display output on webpage (currently displayed in console log)
+
+
+Part III - Outline of Code structure & basics of how it works
+
+    HTML:
+		- Imports style.css for basic presentation of webpage
+		- Loads all div classes (menu bar, canvas, etc.)
+		- Loads all buttons with img src from images folder (if applicable)
+		- Imports scripts (grid.js, node-gate.js, main.js)
+    Images:
+        Creation:
+			- Each gate image is loaded via constructor in each gate class (node-gate.js)
+				and drawn in main.js
+			- The images, created in Photoshop, were made to scale to the grid
+				- All nodes and edges align with grid
+        Sizing:
+			- Each "grid unit" = 1 box
+				- 10px x 10px
+			- Each gate image has an indicator for its size 
+				- (i.e. "7x6_LED" is 7 grid units wide and 6 grid units tall
+					or 70px x 60px)
+    Javascript:
+		- grid.js
+			- Contains functions for drawing grid lines,
+				as well as the grid itself
+			- Gets canvas element in HTML by id ("grid")
+		- node-gate.js
+			- Main "back end" script containing the functionality of circuit pieces and nodes.
+			- CircuitNode class holds the information of pieces as it relates to the parent/child connections.
+			- CircuitPiece is the superclass of all circuit pieces
+				- Holds all attributes of the circuits such as x,y location of the top left of the circuit piece, name,
+				  and x,y locations of all inputs and output locations which are placed in an array of varying size based on the circuit piece.
+				- Those locations are tracked and set via setLocation(x,y)
+				- SetLocation of the inputs and outputs are set for the standard two inputs one output of the 10x6 images and overridden in other cases.
+			- Sub classes are all of the circuit pieces and adds in the attribute of input and output to track flow within the full circuit,
+			  also added is the src img of the pieces.
+				
+			
+		- main.js
+			- Main "bridge" from front end to back end
+			- Creates Sets for all nodes and wires on the screen to a null set, to later be added to.
+			- Sets all relevant initial variables to null and false, to later be changed if necessary.
+			- Contains functions for tracking new and removed connections which track whether input/output locations of different circuit pieces connect on the canvas.
+			- Contains functions for saving and loading (not fully functional yet, see code comments)
+			- Contains functions for drawing new gates and wires
+				- Each specific element is added to a specific Set() with set properties
+			- Adds event listeners to all buttons within the HTML
+			- Adds event listener to the "gates" canvas on mouse down
+				- If "deleting" button selected, carry out deleting function
+				- If "moving" button selected, carry out moving function
+					- checkClick(x,y): checks if click is on gate or nothing
+				- If a "gate" button is selected, carry out function for placing and drawing gates
+				- If "wire" button selected, carry out function for placing and drawing wires
+

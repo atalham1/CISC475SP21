@@ -81,6 +81,12 @@ function play() {
         });
         i++;
     }
+    
+    console.log(nodes);
+
+    connectionCheck();
+    drawGates();
+
     if(led != null){
         console.log(led.piece.output)
     }
@@ -225,8 +231,26 @@ function drawGates() {
     //drawn when we drag a gate across the screen
     ctx.clearRect(0,0,2000,2000)
     nodes.forEach(function (element) {
-        ctx.drawImage(element.img,element.piece.xpos,element.piece.ypos,element.img.width/10,element.img.height/10)
+
+        var img = new Image();
+        if (element.piece != null) {
+            img.src = element.piece.img_path;
+        }
+        else {
+            img = element.img;
+        }
+
+        if (!play_pressed) {
+            ctx.drawImage(img,element.piece.xpos,element.piece.ypos,element.img.width/10,element.img.height/10)
+        }
+        else {
+            img.onload=function() {
+                ctx.drawImage(img,element.piece.xpos,element.piece.ypos,element.img.width/10,element.img.height/10)
+            }
+        }
+
     });
+
 
     ctx.beginPath();
     wires.forEach(function(element){

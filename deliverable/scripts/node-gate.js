@@ -112,6 +112,7 @@ class AndGate extends CircuitPiece{
 	getOutput(){
 		if(this.input[0] == 1 && this.input[1] == 1){
 			this.output = 1;
+			this.img_path = "images/10x6_and_on_both.png"
 		}
 		else{
 			this.output = 0;
@@ -162,12 +163,22 @@ class OrGate extends CircuitPiece{
 		this.img_path = "images/10x6_or.png";
 	}
 	getOutput(){
-		if (this.input[0] == 1 || this.input[1] == 1) {
-            this.output = 1;
-        }
-        else {
-            this.output = 0;
-        }
+		if (this.input[0] == 1 && this.input[1] == 1) {
+			this.output = 1;
+			this.img_path = "images/10x6_or_on_both.png";
+		}
+		else if (this.input[0] == 1) {
+			this.output = 1;
+			this.img_path = "images/10x6_or_on_top.png";
+		}
+        else if (this.input[1] == 1){
+			this.output = 1;
+			this.img_path = "images/10x6_or_on_bot.png";
+		}
+		else {
+			this.output = 0;
+			this.img_path = "images/10x6_or.png";
+		}
 	}
 	reset(){
 		this.input = [0,0];
@@ -273,9 +284,11 @@ class NotGate extends CircuitPiece{
 	getOutput(){
 		if(this.input[0] == 0){
 			this.output = 1;
+			this.img_path = "images/10x6_not_off.png"
 		}
 		else {
 			this.output = 0;
+			this.img_path = "images/10x6_not_on.png"
 		}
 	}
 	reset(){
@@ -374,7 +387,14 @@ class PositiveIn extends CircuitPiece{
 		this.outputLocations=[x+60,y+30];
 	}
 	//unused but called in main when saving
-	getOutput(){}
+	getOutput(){
+		if (this.output == 1) {
+			this.img_path = "images/7x6_positive_on.png";
+		}
+		else {
+			this.img_path = "images/7x6_positive.png";
+		}
+	}
 	reset(){}
 }
 //NEGATIVE INPUT CLASS
@@ -411,6 +431,12 @@ class LEDout extends CircuitPiece{
 	}
 	getOutput(){
 		this.output = this.input[0];
+		if (this.output == 1) {
+			this.img_path = "images/7x6_LED_on.png";
+		}
+		else {
+			this.img_path = "images/7x6_LED.png";
+		}
 	}
 	reset(){
 		this.input = [0];

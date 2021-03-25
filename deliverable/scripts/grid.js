@@ -23,11 +23,11 @@ function drawGrid() {
     var gridOptions = {
         minorLines: {
             separation: 10,
-            color: '#DCDCDC'
+            color: '#fffadf'
         },
         majorLines: {
             separation: 100,
-            color: '#000000'
+            color: '#fed600'
         }
     };
     drawGridLines(cnv, gridOptions.minorLines);

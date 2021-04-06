@@ -1,4 +1,4 @@
-"use strict";
+// "use strict";
 
 // Maybe Need to implement timer funciton
 
@@ -15,7 +15,7 @@ var wires = new Set();
 
 //tmp to hold current selected gate
 var tmp_gate = null;
-
+var touch = false
 
 /*
     Used to hold id of button clicked
@@ -42,8 +42,8 @@ var deleting = false;
 //vars for wire button
 var isWire = false;
 var tmp_wire = null;
-var label = false
 
+var label = false
 /*
    PLAY FUNCTION
    Cycle through all gates; Reset inputs and outputs to default
@@ -66,12 +66,12 @@ var label = false
 function play() {
     var led = null
     var i = 0;
-    nodes.forEach(function(element){
+    nodes.forEach(function (element) {
         element.piece.reset()
     })
     while (i < 2) {
         nodes.forEach(function (element) {
-            if(element.piece instanceof LEDout){
+            if (element.piece instanceof LEDout) {
                 led = element
             }
             element.getInput();
@@ -81,13 +81,7 @@ function play() {
         });
         i++;
     }
-    
-    console.log(nodes);
-
-    connectionCheck();
-    drawGates();
-
-    if(led != null){
+    if (led != null) {
         console.log(led.piece.output)
     }
 }
@@ -99,13 +93,13 @@ function play() {
    Break connection removes the parent from the child's parent list
 
 */
-function newConnection(parentNode, childNode,input_idx) {
-    childNode.parent.push([parentNode,input_idx]);
+function newConnection(parentNode, childNode, input_idx) {
+    childNode.parent.push([parentNode, input_idx]);
 }
 function breakConnections(parentNode, childNode) {
-    for(let i=0;i<childNode.parent.length;i++){
-        if(Object.is(childNode.parent[i][0],parentNode)){
-            childNode.parent.splice(i,1);
+    for (let i = 0; i < childNode.parent.length; i++) {
+        if (Object.is(childNode.parent[i][0], parentNode)) {
+            childNode.parent.splice(i, 1);
             break;
         }
     }
@@ -129,19 +123,19 @@ function breakConnections(parentNode, childNode) {
         If element1 is on element2 input location and that location boolean is false,
         new connection and set boolean to true
 */
-function connectionCheck(){
-    nodes.forEach(function(element1){
-        if(element1.piece instanceof LEDout){ // LEDout class does not have outputLocations
+function connectionCheck() {
+    nodes.forEach(function (element1) {
+        if (element1.piece instanceof LEDout) { // LEDout class does not have outputLocations
             return;
         }
-        nodes.forEach(function(element2){
+        nodes.forEach(function (element2) {
             //breaking connections
             //check if parent and if not on the input, then break
             var isParent = false;
             var parent_input_idx = 0
-            for(let i=0;i<element2.parent.length;i++){
-                if(Object.is(element1,element2.parent[i][0]) == true){
-                    isParent=true;
+            for (let i = 0; i < element2.parent.length; i++) {
+                if (Object.is(element1, element2.parent[i][0]) == true) {
+                    isParent = true;
                     parent_input_idx = element2.parent[i][1]
                     break;
                 }
@@ -157,12 +151,12 @@ function connectionCheck(){
             }
             //making connections
             //check if on each other, then connect
-            for(let i=0;i<element2.piece.inputLocations.length;i++){
-                if((element1.piece.outputLocations[0]==element2.piece.inputLocations[i][0]) &&
-                    (element1.piece.outputLocations[1]==element2.piece.inputLocations[i][1]) &&
-                    (element2.piece.inputLocations[i][2]==false)){
-                    element2.piece.inputLocations[i][2]=true;
-                    newConnection(element1,element2,i);
+            for (let i = 0; i < element2.piece.inputLocations.length; i++) {
+                if ((element1.piece.outputLocations[0] == element2.piece.inputLocations[i][0]) &&
+                    (element1.piece.outputLocations[1] == element2.piece.inputLocations[i][1]) &&
+                    (element2.piece.inputLocations[i][2] == false)) {
+                    element2.piece.inputLocations[i][2] = true;
+                    newConnection(element1, element2, i);
                 }
             }
         });
@@ -205,7 +199,7 @@ function loadFile(file_name) {
     var string_to_load = fs.readFileSync(file_name, 'utf-8');
     var myarr = JSON.parse(string_to_load);
     nodes = new Set(myarr);
-    
+
 }
 
 /*
@@ -225,12 +219,13 @@ function loadFile(file_name) {
 
 
 */
+
 function drawGates() {
     var c = document.getElementById("gates")
     var ctx = c.getContext("2d")
     ctx.font = "30px serif";
-    ctx.textBaseline = 'middle'; //Set the vertical alignment of the text
-    ctx.textAlign = 'center';//Set the horizontal alignment of the text
+    ctx.textBaseline = 'middle'; //设置文本的垂直对齐方式
+    ctx.textAlign = 'center';//设置文本的水平对齐方式
 
     //We clear the canvas to prevent a trail of gates from being
     //drawn when we drag a gate across the screen
@@ -241,13 +236,13 @@ function drawGates() {
         elements[i].parentNode.removeChild(elements[i]);
     }
 
-    var img = document.createElement("img");//Create picture
+    var img = document.createElement("img");//创建图片
     img.src = "images/icon.png";
     img.className = 'divs'
     img.style.width = '20px'
     img.style.height = '20px';
 
-    ctx.clearRect(0,0,2000,2000)
+    ctx.clearRect(0, 0, 2000, 2000)
     nodes.forEach(function (element) {
         if (element.piece.label) {
             img.addEventListener('click', () => {
@@ -267,13 +262,13 @@ function drawGates() {
         }
     });
 
+    ctx.beginPath();
+    ctx.restore();
 
-    //ctx.beginPath();
-    ctx.restore()
-    wires.forEach(function(element){
+    wires.forEach(function (element) {
         ctx.moveTo(element.left[0], element.left[1]);
-        ctx.arc(element.left[0], element.left[1], 5, 0, 2*Math.PI)
-        ctx.arc(element.right[0], element.right[1], 5, -Math.PI,Math.PI)
+        ctx.arc(element.left[0] - 5, element.left[1], 5, 0, 2 * Math.PI)
+        ctx.arc(element.right[0], element.right[1], 5, -Math.PI, Math.PI)
         ctx.stroke();
     })
 }
@@ -282,7 +277,7 @@ function drawGates() {
     Check if position of mouse (x,y) is within the bounds of the image
     return the image clicked on.
 */
-function checkClick(x,y){
+function checkClick(x, y) {
     var tmp = null
     nodes.forEach(function (element) {
         if (tmp) { return null }
@@ -297,6 +292,31 @@ function checkClick(x,y){
             }
         }
     });
+    wires.forEach(function (element) {
+
+        let maps = {
+            1: ((element.left[0] - x) <= 10 && (element.left[0] - x) >= 0) && ((element.left[1] - y) <= 10 && (element.left[1] - y) >= 0),
+            2: ((element.right[0] - x) <= 10 && (element.right[0] - x) >= 0) && ((element.right[1] - y) <= 10 && (element.right[1] - y) >= 0)
+        }
+        element['maps'] = maps
+        if (tmp) { return null }
+        if (maps[1] || maps[2]) {
+            element['touch'] = false
+            tmp = element
+        } else {
+
+            let ismode = {
+                1: (x > element.left[0] && x - element.left[0] >= 0) && (x < element.right[0] && element.right[0] - x >= 0),
+                // 2: y + 30 >= element.left[1] && y <= element.right[1] && element.right[1] - y >= 40
+                2: true
+            }
+            // && (() && element.right[0] < y
+            if (ismode[1] && ismode[2]) {
+                element['touch'] = true
+                tmp = element
+            }
+        }
+    })
     return tmp;
 }
 
@@ -318,12 +338,12 @@ function checkClick(x,y){
 */
 
 //Control buttons
-document.getElementById("play_btn").addEventListener("click", function() {
+document.getElementById("play_btn").addEventListener("click", function () {
     document.getElementById('desc1').textContent = "Circuit is currently: PLAYING.";
     play_pressed = true;
     play();
 });
-document.getElementById("stop_btn").addEventListener("click", function() {
+document.getElementById("stop_btn").addEventListener("click", function () {
     play_pressed = false
     document.getElementById('desc1').textContent = "Circuit is currently: STOPPED.";
 });
@@ -337,145 +357,144 @@ document.getElementById("pause_btn").addEventListener("click", function() {
 */
 
 // Delete button
-document.getElementById("delete").addEventListener("click", function() {
+document.getElementById("delete").addEventListener("click", function () {
     deleting = true;
     moving = false;
-	isWire = false;
+    isWire = false;
     label = false
     document.getElementById('desc2').textContent = "Click a gate to delete it.";
 });
 //Move button
-document.getElementById("move").addEventListener("click", function() {
+document.getElementById("move").addEventListener("click", function () {
     deleting = false;
-	isWire = false;
+    isWire = false;
     moving = true;
     label = false
     document.getElementById('desc2').textContent = "Click a gate to drag around.";
 });
 //Wire button
-document.getElementById("wire").addEventListener("click", function() {
+document.getElementById("wire").addEventListener("click", function () {
     isWire = true;
-	deleting = false;
-	moving = false;
-	tmp_gate= null;
+    deleting = false;
+    moving = false;
+    tmp_gate = null;
     label = false
     document.getElementById('desc2').textContent = "Click a gate to drag around.";
 });
 
-//Label Buttons
-document.getElementById("Label-gate").addEventListener("click", function () {
-    gate_btn_id = "Label-gate"
-    deleting = false;
-    moving = false;
-    isWire = false;
-    label = true
-    document.getElementById('desc2').textContent = "Click to add Label.";
-});
-
 //Gate Buttons
-document.getElementById("and-gate").addEventListener("click", function() {
+document.getElementById("and-gate").addEventListener("click", function () {
     tmp_gate = new CircuitNode(new AndGate());
     gate_btn_id = "and-gate"
     deleting = false;
     moving = false;
-	isWire = false;
+    isWire = false;
     label = false
-	document.getElementById('desc2').textContent =  "Click to add AND Gate.";
+    document.getElementById('desc2').textContent = "Click to add AND Gate.";
 });
-document.getElementById("or-gate").addEventListener("click", function() {
+//Gate Buttons
+document.getElementById("label-gate").addEventListener("click", function () {
+    gate_btn_id = "label-gate"
+    deleting = false;
+    moving = false;
+    isWire = false;
+    label = true
+    document.getElementById('desc2').textContent = "Click to add AND Gate.";
+});
+
+document.getElementById("or-gate").addEventListener("click", function () {
     tmp_gate = new CircuitNode(new OrGate());
     gate_btn_id = "or-gate"
     deleting = false;
     moving = false;
     isWire = false;
     label = false
-	document.getElementById('desc2').textContent = "Click to add OR Gate.";
+    document.getElementById('desc2').textContent = "Click to add OR Gate.";
 });
-document.getElementById("not-gate").addEventListener("click", function() {
+document.getElementById("not-gate").addEventListener("click", function () {
     tmp_gate = new CircuitNode(new NotGate());
     gate_btn_id = "not-gate"
     deleting = false;
     moving = false;
-	isWire = false;
     label = false
-	document.getElementById('desc2').textContent = "Click to add NOR Gate.";
+    isWire = false;
+    document.getElementById('desc2').textContent = "Click to add NOR Gate.";
 });
-document.getElementById("nand-gate").addEventListener("click", function() {
+document.getElementById("nand-gate").addEventListener("click", function () {
     tmp_gate = new CircuitNode(new NandGate());
     gate_btn_id = "nand-gate"
+    deleting = false;
     moving = false;
     isWire = false;
-    label = false
-	document.getElementById('desc2').textContent = "Click to add NAND Gate.";
+    document.getElementById('desc2').textContent = "Click to add NAND Gate.";
 });
-document.getElementById("nor-gate").addEventListener("click", function() {
+document.getElementById("nor-gate").addEventListener("click", function () {
     tmp_gate = new CircuitNode(new NorGate());
     gate_btn_id = "nor-gate"
     deleting = false;
     moving = false;
-	isWire = false;
+    isWire = false;
     label = false
-	document.getElementById('desc2').textContent = "Click to add NOR Gate.";
+    document.getElementById('desc2').textContent = "Click to add NOR Gate.";
 });
-document.getElementById("xnor-gate").addEventListener("click", function() {
+document.getElementById("xnor-gate").addEventListener("click", function () {
     tmp_gate = new CircuitNode(new XnorGate());
     gate_btn_id = "xnor-gate"
     moving = false;
     isWire = false;
-    label = false
-	document.getElementById('desc2').textContent = "Click to add XNOR Gate.";
+    document.getElementById('desc2').textContent = "Click to add XNOR Gate.";
 });
-document.getElementById("xor-gate").addEventListener("click", function() {
+document.getElementById("xor-gate").addEventListener("click", function () {
     tmp_gate = new CircuitNode(new XorGate());
     gate_btn_id = "xor-gate"
     deleting = false;
     moving = false;
     isWire = false;
     label = false
-	document.getElementById('desc2').textContent = "Click to add XOR Gate.";
+    document.getElementById('desc2').textContent = "Click to add XOR Gate.";
 });
-document.getElementById("5-and-gate").addEventListener("click", function() {
+document.getElementById("5-and-gate").addEventListener("click", function () {
     tmp_gate = new CircuitNode(new FiveAndGate());
     gate_btn_id = "5-and-gate"
     moving = false;
-	isWire = false;
+    isWire = false;
     label = false
-	document.getElementById('desc2').textContent = "Click to add 5-input AND Gate.";
+    document.getElementById('desc2').textContent = "Click to add 5-input AND Gate.";
 });
-document.getElementById("5-or-gate").addEventListener("click", function() {
+document.getElementById("5-or-gate").addEventListener("click", function () {
     tmp_gate = new CircuitNode(new FiveOrGate());
     gate_btn_id = "5-or-gate"
     deleting = false;
     moving = false;
     isWire = false;
     label = false
-	document.getElementById('desc2').textContent = "Click to add 5-input OR Gate.";
+    document.getElementById('desc2').textContent = "Click to add 5-input OR Gate.";
 });
-document.getElementById("out-led").addEventListener("click", function() {
+document.getElementById("out-led").addEventListener("click", function () {
     tmp_gate = new CircuitNode(new LEDout());
     gate_btn_id = "out-led"
     moving = false;
-	isWire = false;
+    isWire = false;
     label = false
-	document.getElementById('desc2').textContent = "Click to add LED Output.";
+    document.getElementById('desc2').textContent = "Click to add LED Output.";
 });
-document.getElementById("positive-input").addEventListener("click", function() {
+document.getElementById("positive-input").addEventListener("click", function () {
     tmp_gate = new CircuitNode(new PositiveIn());
     gate_btn_id = "positive-input"
     deleting = false;
     moving = false;
     isWire = false;
     label = false
-	document.getElementById('desc2').textContent = "Click to add Positive Input.";
+    document.getElementById('desc2').textContent = "Click to add Positive Input.";
 });
-document.getElementById("zero-input").addEventListener("click", function() {
+document.getElementById("zero-input").addEventListener("click", function () {
     tmp_gate = new CircuitNode(new NegativeIn());
     gate_btn_id = "zero-input"
     deleting = false;
     moving = false;
-	isWire = false;
+    isWire = false;
     label = false
-	document.getElementById('desc2').textContent = "Click to add Zero Input.";
+    document.getElementById('desc2').textContent = "Click to add Zero Input.";
 });
 /*
     Clicking the grid: (holding the mouse down)
@@ -514,9 +533,9 @@ document.getElementById("zero-input").addEventListener("click", function() {
 
 
 */
-document.getElementById("gates").addEventListener("mousedown", function(e) {
-    var x = (e.offsetX) - (e.offsetX%10);
-    var y = (e.offsetY) - (e.offsetY%10);
+document.getElementById("gates").addEventListener("mousedown", function (e) {
+    var x = (e.offsetX) - (e.offsetX % 10);
+    var y = (e.offsetY) - (e.offsetY % 10);
     if (label == true) {
         var name = prompt("input table"); //将输入的内容赋给变量 name ， 
         if (name) {
@@ -533,64 +552,111 @@ document.getElementById("gates").addEventListener("mousedown", function(e) {
             tmp_gate = checkClick(x, y)
             if (tmp_gate != null) {
                 nodes.delete(tmp_gate)
+                wires.delete(tmp_gate)
                 tmp_gate = null
             }
             if (play_pressed) {
                 play();
             }
         } else if (moving) {
+
             tmp_gate = checkClick(x, y)
             if (tmp_gate != null) {
-                //fucntion to be used by listeners
-                var moveTo = function (e) {
-                    x = (e.offsetX) - (e.offsetX % 10);
-                    y = (e.offsetY) - (e.offsetY % 10);
-                    tmp_gate.piece.setLocation(x, y);
-                    connectionCheck();
-                    if (play_pressed) {
-                        play();
+                var moveTo
+                if (tmp_gate.left) {
+                    if (tmp_gate['touch']) {
+                        console.log(tmp_gate)
+
+                        moveTo = function (e) {
+                            let left0 = tmp_gate.left[0]
+                            x = (e.offsetX) - (e.offsetX % 10);
+                            y = (e.offsetY) - (e.offsetY % 10);
+                            let xx = left0 >= x ? left0 - x : x - left0
+                            let xy = left0 >= x ? tmp_gate.right[0] - xx : tmp_gate.right[0] + xx
+                            let values = tmp_gate.rights - tmp_gate.lefts
+                            let righty = y > tmp_gate.right[1] ? y - values : y + values
+                            tmp_gate.setLeft(x, y);
+                            tmp_gate.setRight(xy, righty);
+                            if (play_pressed) {
+                                play();
+                            }
+                            drawGates();
+                        }
+                    } else {
+                        moveTo = function (e) {
+                            if (tmp_gate['maps'][1]) {
+                                x = (e.offsetX) - (e.offsetX % 10);
+                                y = (e.offsetY) - (e.offsetY % 10);
+                                tmp_gate.setLeft(x, y);
+                            } else {
+                                x = (e.offsetX) - (e.offsetX % 10);
+                                y = (e.offsetY) - (e.offsetY % 10);
+                                tmp_gate.setRight(x, y);
+                            }
+                            connectionCheck();
+                            if (play_pressed) {
+                                play();
+                            }
+                            drawGates();
+                        }
                     }
-                    drawGates();
+
+                } else {
+                    //fucntion to be used by listeners
+                    moveTo = function (e) {
+                        x = (e.offsetX) - (e.offsetX % 10);
+                        y = (e.offsetY) - (e.offsetY % 10);
+                        tmp_gate.piece.setLocation(x, y);
+                        connectionCheck();
+                        if (play_pressed) {
+                            play();
+                        }
+                        drawGates();
+                    }
                 }
+
                 document.getElementById("gates").addEventListener("mousemove", moveTo);
                 document.getElementById("gates").addEventListener("mouseup", function () {
+                    console.log(99999)
+                    console.log(tmp_gate)
                     document.getElementById("gates").removeEventListener("mousemove", moveTo);
                 });
-            
-
-        }
-
-    }
-    else if(tmp_gate) {
-        document.getElementById(gate_btn_id).click(); //used to make new gate instance
-        tmp_gate.piece.setLocation(x,y);
-        nodes.add(tmp_gate);
-        if(play_pressed){
-            play();
-        }
-    }
-	else if(isWire) {		
-        tmp_wire= new Wire();
-        tmp_wire.setLeft(x,y);
-        tmp_wire.setRight(x,y);
-	
-		var moveTo = function(e){
-			x = (e.offsetX) - (e.offsetX%10);
-			y = (e.offsetY) - (e.offsetY%10);
-			tmp_wire.setRight(x, y);
-            if(play_pressed){
+            }
+        } else if (tmp_gate) {
+            document.getElementById(gate_btn_id).click(); //used to make new gate instance
+            tmp_gate.piece.setLocation(x, y);
+            nodes.add(tmp_gate);
+            if (play_pressed) {
                 play();
             }
-            drawGates();
-		}
-		
-		document.getElementById("gates").addEventListener("mousemove", moveTo);
-        document.getElementById("gates").addEventListener("mouseup", function(){
-            document.getElementById("gates").removeEventListener("mousemove",moveTo);
-        });
-		wires.add(tmp_wire);
+        } else if (isWire) {
+            tmp_wire = new Wire();
+            tmp_wire.setLeft(x, y);
+            tmp_wire.setRight(x, y);
+            tmp_wire['leftwidhts'] = x
+            tmp_wire['lefts'] = y
+            var moveTo = function (e) {
+                x = (e.offsetX) - (e.offsetX % 10);
+                y = (e.offsetY) - (e.offsetY % 10);
+                tmp_wire['rightwidhts'] = x
+                tmp_wire['rights'] = y
+                tmp_wire.setRight(x, y);
+                if (play_pressed) {
+                    play();
+                }
+                drawGates();
+            }
+
+            document.getElementById("gates").addEventListener("mousemove", moveTo);
+            document.getElementById("gates").addEventListener("mouseup", function () {
+                document.getElementById("gates").removeEventListener("mousemove", moveTo);
+            });
+
+            wires.add(tmp_wire);
+        }
+
     }
-}
+
     connectionCheck();
     drawGates();
 });

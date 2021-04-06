@@ -25,8 +25,8 @@ class CircuitNode {
 	}
 
 	getInput() {
-        for (let i = 0; i < this.parent.length; i++) {
-            this.piece.input[this.parent[i][1]] = this.parent[i][0].piece.output;
+		for (let i = 0; i < this.parent.length; i++) {
+			this.piece.input[this.parent[i][1]] = this.parent[i][0].piece.output;
 		}
 	}
 }
@@ -46,7 +46,6 @@ class CircuitNodeView {
 		}
 	}
 }
-
 /*
 	(Looking at it now, an abstract class may not be the way to go)
 
@@ -77,24 +76,24 @@ class CircuitNodeView {
 		sets name of the piece- should be used to simulate 'lables' on the real site
 
 */
-class CircuitPiece{
-	constructor(){
+class CircuitPiece {
+	constructor() {
 		this.xpos = 0;
 		this.ypos = 0;
 		this.name = null;
-		this.inputLocations=[[0,0,false],[0,0,false]];
-		this.ouputLocations=[0,0];
+		this.inputLocations = [[0, 0, false], [0, 0, false]];
+		this.ouputLocations = [0, 0];
 	}
-	setLocation(x,y){
+	setLocation(x, y) {
 		this.xpos = x;
 		this.ypos = y;
-		this.inputLocations[0][0] = x+10
-		this.inputLocations[0][1] = y+20
-		this.inputLocations[1][0] = x+10
-		this.inputLocations[1][1] = y+40
-		this.outputLocations=[x+90,y+30];
+		this.inputLocations[0][0] = x + 10
+		this.inputLocations[0][1] = y + 20
+		this.inputLocations[1][0] = x + 10
+		this.inputLocations[1][1] = y + 40
+		this.outputLocations = [x + 90, y + 30];
 	}
-	giveName(newName){
+	giveName(newName) {
 		this.name = newName
 	}
 }
@@ -118,28 +117,27 @@ class CircuitPiece{
 
 
 //AND GATE CLASS
-class AndGate extends CircuitPiece{
-	constructor(){
+class AndGate extends CircuitPiece {
+	constructor() {
 		super();
-		this.input = [0,0];
+		this.input = [0, 0];
 		this.output = 0;
 		this.img_path = "images/10x6_and.png";
 	}
-	getOutput(){
-		if(this.input[0] == 1 && this.input[1] == 1){
+	getOutput() {
+		if (this.input[0] == 1 && this.input[1] == 1) {
 			this.output = 1;
-			this.img_path = "images/10x6_and_on_both.png"
 		}
-		else{
+		else {
 			this.output = 0;
 		}
 	}
-	reset(){
-		this.input = [0,0];
+	reset() {
+		this.input = [0, 0];
 		this.output = 0;
 	}
 }
-//Lable CLASS
+//NOR CLASS
 class Labels extends CircuitPiece {
 	constructor(props) {
 		super(props);
@@ -172,323 +170,297 @@ class Labels extends CircuitPiece {
 		this.output = 1;
 	}
 }
-
 //NAND GATE CLASS
-class NandGate extends CircuitPiece{
-	constructor(){
+class NandGate extends CircuitPiece {
+	constructor() {
 		super();
-		this.input = [0,0];
+		this.input = [0, 0];
 		this.output = 1;
 		this.img_path = "images/11x6_nand.png";
 	}
-	
-	setLocation(x,y){
+
+	setLocation(x, y) {
 		this.xpos = x;
 		this.ypos = y;
-		this.inputLocations[0][0] = x+10
-		this.inputLocations[0][1] = y+20
-		this.inputLocations[1][0] = x+10
-		this.inputLocations[1][1] = y+40
-		this.outputLocations=[x+100,y+30];
+		this.inputLocations[0][0] = x + 10
+		this.inputLocations[0][1] = y + 20
+		this.inputLocations[1][0] = x + 10
+		this.inputLocations[1][1] = y + 40
+		this.outputLocations = [x + 100, y + 30];
 	}
-	getOutput(){
+	getOutput() {
 		if (this.input[0] == 1 && this.input[1] == 1) {
-            this.output = 0;
-        }
-        else {
-            this.output = 1;
-        }
+			this.output = 0;
+		}
+		else {
+			this.output = 1;
+		}
 	}
-	reset(){
-		this.input = [0,0];
+	reset() {
+		this.input = [0, 0];
 		this.output = 1;
 	}
 }
 //OR GATE CLASS
-class OrGate extends CircuitPiece{
-	constructor(){
+class OrGate extends CircuitPiece {
+	constructor() {
 		super();
-		this.input = [0,0];
+		this.input = [0, 0];
 		this.output = 0;
 		this.img_path = "images/10x6_or.png";
 	}
-	getOutput(){
-		if (this.input[0] == 1 && this.input[1] == 1) {
+	getOutput() {
+		if (this.input[0] == 1 || this.input[1] == 1) {
 			this.output = 1;
-			this.img_path = "images/10x6_or_on_both.png";
-		}
-		else if (this.input[0] == 1) {
-			this.output = 1;
-			this.img_path = "images/10x6_or_on_top.png";
-		}
-        else if (this.input[1] == 1){
-			this.output = 1;
-			this.img_path = "images/10x6_or_on_bot.png";
 		}
 		else {
 			this.output = 0;
-			this.img_path = "images/10x6_or.png";
 		}
 	}
-	reset(){
-		this.input = [0,0];
+	reset() {
+		this.input = [0, 0];
 		this.output = 0;
 	}
 }
 //XOR CLASS
-class XorGate extends CircuitPiece{
-	constructor(){
+class XorGate extends CircuitPiece {
+	constructor() {
 		super();
-		this.input = [0,0];
+		this.input = [0, 0];
 		this.output = 0;
 		this.img_path = "images/10x6_xor.png";
 	}
-	getOutput(){
+	getOutput() {
 		if (this.input[0] != this.input[1]) {
-            this.output = 1;
-        }
-        else {
-            this.output = 0;
-        }
+			this.output = 1;
+		}
+		else {
+			this.output = 0;
+		}
 	}
-	reset(){
-		this.input = [0,0];
+	reset() {
+		this.input = [0, 0];
 		this.output = 0;
 	}
 }
 //NOR CLASS
-class NorGate extends CircuitPiece{
-	constructor(){
+class NorGate extends CircuitPiece {
+	constructor() {
 		super();
-		this.input = [0,0];
+		this.input = [0, 0];
 		this.output = 1;
 		this.img_path = "images/11x6_nor.png";
 	}
-	setLocation(x,y){
+	setLocation(x, y) {
 		this.xpos = x;
 		this.ypos = y;
-		this.inputLocations[0][0] = x+10
-		this.inputLocations[0][1] = y+20
-		this.inputLocations[1][0] = x+10
-		this.inputLocations[1][1] = y+40
-		this.outputLocations=[x+100,y+30];
+		this.inputLocations[0][0] = x + 10
+		this.inputLocations[0][1] = y + 20
+		this.inputLocations[1][0] = x + 10
+		this.inputLocations[1][1] = y + 40
+		this.outputLocations = [x + 100, y + 30];
 	}
-	getOutput(){
+	getOutput() {
 		if (this.input[0] == 0 && this.input[1] == 0) {
-            this.output = 1;
-        }
-        else {
-            this.output = 0;
-        }
+			this.output = 1;
+		}
+		else {
+			this.output = 0;
+		}
 	}
-	reset(){
-		this.input = [0,0];
+	reset() {
+		this.input = [0, 0];
 		this.output = 1;
 	}
 }
 //XNOR CLASS
-class XnorGate extends CircuitPiece{
-	constructor(){
+class XnorGate extends CircuitPiece {
+	constructor() {
 		super();
-		this.input = [0,0];
+		this.input = [0, 0];
 		this.output = 1;
 		this.img_path = "images/11x6_xnor.png";
 	}
-	setLocation(x,y){
+	setLocation(x, y) {
 		this.xpos = x;
 		this.ypos = y;
-		this.inputLocations[0][0] = x+10
-		this.inputLocations[0][1] = y+20
-		this.inputLocations[1][0] = x+10
-		this.inputLocations[1][1] = y+40
-		this.outputLocations=[x+100,y+30];
+		this.inputLocations[0][0] = x + 10
+		this.inputLocations[0][1] = y + 20
+		this.inputLocations[1][0] = x + 10
+		this.inputLocations[1][1] = y + 40
+		this.outputLocations = [x + 100, y + 30];
 	}
-	getOutput(){
+	getOutput() {
 		if (this.input[0] == this.input[1]) {
-            this.output = 1;
-        }
-        else {
-            this.output = 0;
-        }
+			this.output = 1;
+		}
+		else {
+			this.output = 0;
+		}
 	}
-	reset(){
-		this.input = [0,0];
+	reset() {
+		this.input = [0, 0];
 		this.output = 1;
 	}
 }
 //NOT CLASS
-class NotGate extends CircuitPiece{
-	constructor(){
+class NotGate extends CircuitPiece {
+	constructor() {
 		super();
 		this.input = [0];
 		this.output = 1;
 		this.img_path = "images/10x6_not.png";
 	}
-	setLocation(x,y){
+	setLocation(x, y) {
 		this.xpos = x;
 		this.ypos = y;
-		this.inputLocations[0][0] = x+10
-		this.inputLocations[0][1] = y+30
-		this.outputLocations=[x+90,y+30];
+		this.inputLocations[0][0] = x + 10
+		this.inputLocations[0][1] = y + 30
+		this.outputLocations = [x + 90, y + 30];
 	}
-	getOutput(){
-		if(this.input[0] == 0){
+	getOutput() {
+		if (this.input[0] == 0) {
 			this.output = 1;
-			this.img_path = "images/10x6_not_off.png"
 		}
 		else {
 			this.output = 0;
-			this.img_path = "images/10x6_not_on.png"
 		}
 	}
-	reset(){
+	reset() {
 		this.input = [0];
 		this.output = 1
 	}
 }
 //FIVE AND GATE CLASS
-class FiveAndGate extends CircuitPiece{
-	constructor(){
+class FiveAndGate extends CircuitPiece {
+	constructor() {
 		super();
-		this.input = [0,0,0,0,0];
+		this.input = [0, 0, 0, 0, 0];
 		this.output = 0;
 		this.img_path = "images/10x6_5-input-and.png";
-		this.inputLocations=[[0,0,false],[0,0,false],[0,0,false],[0,0,false],[0,0,false]];
+		this.inputLocations = [[0, 0, false], [0, 0, false], [0, 0, false], [0, 0, false], [0, 0, false]];
 	}
-	setLocation(x,y){
+	setLocation(x, y) {
 		this.xpos = x;
 		this.ypos = y;
-		this.inputLocations[0][0] = x+10
-		this.inputLocations[0][1] = y+10
-		this.inputLocations[1][0] = x+10
-		this.inputLocations[1][1] = y+20
-		this.inputLocations[2][0] = x+10
-		this.inputLocations[2][1] = y+30
-		this.inputLocations[3][0] = x+10
-		this.inputLocations[3][1] = y+40
-		this.inputLocations[4][0] = x+10
-		this.inputLocations[4][1] = y+50
-		this.outputLocations=[x+90,y+30];
+		this.inputLocations[0][0] = x + 10
+		this.inputLocations[0][1] = y + 10
+		this.inputLocations[1][0] = x + 10
+		this.inputLocations[1][1] = y + 20
+		this.inputLocations[2][0] = x + 10
+		this.inputLocations[2][1] = y + 30
+		this.inputLocations[3][0] = x + 10
+		this.inputLocations[3][1] = y + 40
+		this.inputLocations[4][0] = x + 10
+		this.inputLocations[4][1] = y + 50
+		this.outputLocations = [x + 90, y + 30];
 	}
-	getOutput(){
+	getOutput() {
 		this.output = 1
-		for(let i = 0; i < this.input.length; i++){
-			if(this.input[i] == 0){
+		for (let i = 0; i < this.input.length; i++) {
+			if (this.input[i] == 0) {
 				this.output = 0;
 				break;
 			}
 		}
 	}
-	reset(){
-		this.input = [0,0,0,0,0];
+	reset() {
+		this.input = [0, 0, 0, 0, 0];
 		this.output = 0;
 	}
 }
 //FIVE OR GATE CLASS
-class FiveOrGate extends CircuitPiece{
-	constructor(){
+class FiveOrGate extends CircuitPiece {
+	constructor() {
 		super();
-		this.input = [0,0,0,0,0];
+		this.input = [0, 0, 0, 0, 0];
 		this.output = 0;
 		this.img_path = "images/10x6_5-input-or.png";
-		this.inputLocations = [[0,0,false],[0,0,false],[0,0,false],[0,0,false],[0,0,false]]
+		this.inputLocations = [[0, 0, false], [0, 0, false], [0, 0, false], [0, 0, false], [0, 0, false]]
 	}
-	setLocation(x,y){
+	setLocation(x, y) {
 		this.xpos = x;
 		this.ypos = y;
-		this.inputLocations[0][0] = x+10
-		this.inputLocations[0][1] = y+10
-		this.inputLocations[1][0] = x+10
-		this.inputLocations[1][1] = y+20
-		this.inputLocations[2][0] = x+10
-		this.inputLocations[2][1] = y+30
-		this.inputLocations[3][0] = x+10
-		this.inputLocations[3][1] = y+40
-		this.inputLocations[4][0] = x+10
-		this.inputLocations[4][1] = y+50
-		this.outputLocations=[x+90,y+30];
+		this.inputLocations[0][0] = x + 10
+		this.inputLocations[0][1] = y + 10
+		this.inputLocations[1][0] = x + 10
+		this.inputLocations[1][1] = y + 20
+		this.inputLocations[2][0] = x + 10
+		this.inputLocations[2][1] = y + 30
+		this.inputLocations[3][0] = x + 10
+		this.inputLocations[3][1] = y + 40
+		this.inputLocations[4][0] = x + 10
+		this.inputLocations[4][1] = y + 50
+		this.outputLocations = [x + 90, y + 30];
 	}
-	getOutput(){
+	getOutput() {
 		this.output = 0
-		for(let i = 0; i < this.input.length; i++){
-			if(this.input[i] == 1){
+		for (let i = 0; i < this.input.length; i++) {
+			if (this.input[i] == 1) {
 				this.output = 1;
 				break;
 			}
 		}
 	}
-	reset(){
-		this.input = [0,0,0,0,0];
+	reset() {
+		this.input = [0, 0, 0, 0, 0];
 		this.output = 0;
 	}
 }
 //POSITIVE INPUT CLASS
-class PositiveIn extends CircuitPiece{
-	constructor(){
+class PositiveIn extends CircuitPiece {
+	constructor() {
 		super();
 		this.input = null;
 		this.output = 1;
 		this.img_path = "images/7x6_positive.png";
 		this.inputLocations = []
 	}
-	setLocation(x,y){
+	setLocation(x, y) {
 		this.xpos = x;
 		this.ypos = y;
-		this.outputLocations=[x+60,y+30];
+		this.outputLocations = [x + 60, y + 30];
 	}
 	//unused but called in main when saving
-	getOutput(){
-		if (this.output == 1) {
-			this.img_path = "images/7x6_positive_on.png";
-		}
-		else {
-			this.img_path = "images/7x6_positive.png";
-		}
-	}
-	reset(){}
+	getOutput() { }
+	reset() { }
 }
 //NEGATIVE INPUT CLASS
-class NegativeIn extends CircuitPiece{
-	constructor(){
+class NegativeIn extends CircuitPiece {
+	constructor() {
 		super();
 		this.input = null;
 		this.output = 0;
 		this.img_path = "images/7x6_zero.png";
 		this.inputLocations = []
 	}
-	setLocation(x,y){
+	setLocation(x, y) {
 		this.xpos = x;
 		this.ypos = y;
-		this.outputLocations=[x+60,y+30];
+		this.outputLocations = [x + 60, y + 30];
 	}
 	//unused but called in main when saving
-	getOutput(){}
-	reset(){}
+	getOutput() { }
+	reset() { }
 }
 //LED OUTPUT CLASS
-class LEDout extends CircuitPiece{
-	constructor(){
+class LEDout extends CircuitPiece {
+	constructor() {
 		super();
 		this.input = [0];
 		this.output = 0;
 		this.img_path = "images/7x6_LED.png";
-		this.inputLocations=[[0,0,false]];
+		this.inputLocations = [[0, 0, false]];
 	}
-	setLocation(x,y){
+	setLocation(x, y) {
 		this.xpos = x;
 		this.ypos = y;
-		this.inputLocations=[[x+10,y+30,this.inputLocations[0][2]]];
+		this.inputLocations = [[x + 10, y + 30, this.inputLocations[0][2]]];
 	}
-	getOutput(){
+	getOutput() {
 		this.output = this.input[0];
-		if (this.output == 1) {
-			this.img_path = "images/7x6_LED_on.png";
-		}
-		else {
-			this.img_path = "images/7x6_LED.png";
-		}
 	}
-	reset(){
+	reset() {
 		this.input = [0];
 		this.output = 0;
 	}
@@ -513,24 +485,24 @@ class LEDout extends CircuitPiece{
 */
 
 //BUTTON CLASS
-class Button extends CircuitPiece{
-	constructor(){
+class Button extends CircuitPiece {
+	constructor() {
 		super();
 		this.pressed = false;
 		this.input = [0];
 		this.output = 0;
 		//still need image
-		this.img_path = "" 
+		this.img_path = ""
 	}
-	getOutput(){
-		if(this.pressed && this.input[0] == 1){
+	getOutput() {
+		if (this.pressed && this.input[0] == 1) {
 			this.output = 1;
 		}
 		else {
 			this.output = 0;
 		}
 	}
-	reset(){
+	reset() {
 		this.pressed = false;
 		this.input = [0];
 		this.output = 0;
@@ -539,24 +511,24 @@ class Button extends CircuitPiece{
 
 //NOT IMPLEMENTED
 //SWITCH CLASS
-class Switch extends CircuitPiece{
-	constructor(){
+class Switch extends CircuitPiece {
+	constructor() {
 		super();
 		this.closed = false;
 		this.input = [0];
 		this.output = 0;
 		//still need image
-		this.img_path = "" 
+		this.img_path = ""
 	}
-	getOutput(){
-		if(this.closed && this.input[0] == 1){
+	getOutput() {
+		if (this.closed && this.input[0] == 1) {
 			this.output = 1;
 		}
 		else {
 			this.output = 0;
 		}
 	}
-	reset(){
+	reset() {
 		this.closed = false;
 		this.input = [0];
 		this.output = 0;
@@ -565,27 +537,27 @@ class Switch extends CircuitPiece{
 
 //NOT IMPLEMENTED
 //2 POLE SWITCH CLASS
-class TwoPoleSwitch extends CircuitPiece{
-	constructor(){
+class TwoPoleSwitch extends CircuitPiece {
+	constructor() {
 		super();
 		this.input = [0];
 		this.output = 0;
 		this.output2 = 0;
 		this.pole_up = true;//starts up
 		//still need image
-		this.img_path = "" 
+		this.img_path = ""
 	}
-	getOutput(){
-		if(this.pole_up){
+	getOutput() {
+		if (this.pole_up) {
 			this.output = this.input[0];
 			this.output2 = 0;
-		} 
+		}
 		else {
 			this.output = 0;
 			this.output2 = this.input[0];
 		}
 	}
-	reset(){
+	reset() {
 		this.input = [0];
 		this.output = 0;
 		this.output2 = 0;
@@ -608,15 +580,15 @@ class TwoPoleSwitch extends CircuitPiece{
 
 //WIRE CLASS
 class Wire {
-	constructor(){
+	constructor() {
 		this.left = null;
 		this.right = null;
 	}
 
-	setLeft(x,y){
-		this.left = [x,y]
+	setLeft(x, y) {
+		this.left = [x, y]
 	}
-	setRight(x,y){
-		this.right = [x,y]
+	setRight(x, y) {
+		this.right = [x, y]
 	}
 }

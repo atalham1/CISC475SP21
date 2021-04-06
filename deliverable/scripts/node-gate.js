@@ -31,6 +31,22 @@ class CircuitNode {
 	}
 }
 
+class CircuitNodeView {
+	constructor(piece) {
+		this.parent = []; //each element holds [ parent_Node, input_index of child]
+		this.piece = piece;
+		this.img = new Image();
+		this.img.width = piece.label.length * 30
+		this.img.height = 70
+	}
+
+	getInput() {
+		for (let i = 0; i < this.parent.length; i++) {
+			this.piece.input[this.parent[i][1]] = this.parent[i][0].piece.output;
+		}
+	}
+}
+
 /*
 	(Looking at it now, an abstract class may not be the way to go)
 
@@ -123,6 +139,40 @@ class AndGate extends CircuitPiece{
 		this.output = 0;
 	}
 }
+//Lable CLASS
+class Labels extends CircuitPiece {
+	constructor(props) {
+		super(props);
+		this.input = [0, 0];
+		this.output = 1;
+		this.label = props
+		// this.props = props
+	}
+	setLocation(x, y) {
+		this.xpos = x;
+		this.ypos = y;
+		this.inputLocations[0][0] = x + 10
+		this.inputLocations[0][1] = y + 20
+		this.inputLocations[1][0] = x + 10
+		this.inputLocations[1][1] = y + 40
+		this.outputLocations = [x + 100, y + 30];
+		this.width = this.label.length * 30
+		this.height = 70
+	}
+	getOutput() {
+		if (this.input[0] == 0 && this.input[1] == 0) {
+			this.output = 1;
+		}
+		else {
+			this.output = 0;
+		}
+	}
+	reset() {
+		this.input = [0, 0];
+		this.output = 1;
+	}
+}
+
 //NAND GATE CLASS
 class NandGate extends CircuitPiece{
 	constructor(){

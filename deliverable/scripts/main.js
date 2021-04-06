@@ -42,7 +42,7 @@ var deleting = false;
 //vars for wire button
 var isWire = false;
 var tmp_wire = null;
-
+var label = false
 
 /*
    PLAY FUNCTION
@@ -147,11 +147,12 @@ function connectionCheck(){
                 }
 
             }
-            if((isParent) && ((element1.piece.outputLocations[0] != element2.piece.inputLocations[parent_input_idx][0]) ||
-              (element1.piece.outputLocations[1] != element2.piece.inputLocations[parent_input_idx][1])) && 
-              (element2.piece.inputLocations[parent_input_idx][2] == true)){
+            if
+                ((isParent) && ((element1.piece.outputLocations[0] != element2.piece.inputLocations[parent_input_idx][0]) ||
+                    (element1.piece.outputLocations[1] != element2.piece.inputLocations[parent_input_idx][1])) &&
+                (element2.piece.inputLocations[parent_input_idx][2] == true)) {
                 element2.piece.inputLocations[parent_input_idx][2] = false
-                breakConnections(element1,element2)
+                breakConnections(element1, element2)
                 return;
             }
             //making connections
@@ -227,36 +228,52 @@ function loadFile(file_name) {
 function drawGates() {
     var c = document.getElementById("gates")
     var ctx = c.getContext("2d")
+    ctx.font = "30px serif";
+    ctx.textBaseline = 'middle'; //Set the vertical alignment of the text
+    ctx.textAlign = 'center';//Set the horizontal alignment of the text
+
     //We clear the canvas to prevent a trail of gates from being
     //drawn when we drag a gate across the screen
+    var canvas = document.getElementById("canvas");
+
+    var elements = document.getElementsByClassName('divs');
+    for (var i = elements.length - 1; i >= 0; i--) {
+        elements[i].parentNode.removeChild(elements[i]);
+    }
+
+    var img = document.createElement("img");//Create picture
+    img.src = "images/icon.png";
+    img.className = 'divs'
+    img.style.width = '20px'
+    img.style.height = '20px';
+
     ctx.clearRect(0,0,2000,2000)
     nodes.forEach(function (element) {
-
-        var img = new Image();
-        if (element.piece != null) {
-            img.src = element.piece.img_path;
+        if (element.piece.label) {
+            img.addEventListener('click', () => {
+                var name = prompt("input table", element.piece.label);
+                element.piece.label = name
+                drawGates()
+            });
+            ctx.fillStyle = "#e5ffeaa8";
+            ctx.fillRect(element.piece.xpos, element.piece.ypos, element.piece.label.length * 30, 70);
+            ctx.fillStyle = "#000000";
+            ctx.fillText(element.piece.label, element.piece.xpos + (element.piece.label.length * 30 / 2), element.piece.ypos + 40)
+            img.style.left = element.piece.xpos + 5 + 'px'
+            img.style.top = element.piece.ypos + 25 + 'px'
+            canvas.append(img)
+        } else {
+            ctx.drawImage(element.img, element.piece.xpos, element.piece.ypos, element.img.width / 10, element.img.height / 10)
         }
-        else {
-            img = element.img;
-        }
-
-        if (!play_pressed) {
-            ctx.drawImage(img,element.piece.xpos,element.piece.ypos,element.img.width/10,element.img.height/10)
-        }
-        else {
-            img.onload=function() {
-                ctx.drawImage(img,element.piece.xpos,element.piece.ypos,element.img.width/10,element.img.height/10)
-            }
-        }
-
     });
 
 
-    ctx.beginPath();
+    //ctx.beginPath();
+    ctx.restore()
     wires.forEach(function(element){
         ctx.moveTo(element.left[0], element.left[1]);
-        ctx.arc(element.left[0],element.left[1], 5, 0, 2*Math.PI)
-        ctx.arc(element.right[0],element.right[1], 5, -Math.PI,Math.PI)
+        ctx.arc(element.left[0], element.left[1], 5, 0, 2*Math.PI)
+        ctx.arc(element.right[0], element.right[1], 5, -Math.PI,Math.PI)
         ctx.stroke();
     })
 }
@@ -267,12 +284,18 @@ function drawGates() {
 */
 function checkClick(x,y){
     var tmp = null
-    nodes.forEach(function(element) {
-        if((x > element.piece.xpos) && (x < element.piece.xpos + (element.img.width/10)) &&
-            (y > element.piece.ypos) && (y < element.piece.ypos + (element.img.height/10)) ) {
+    nodes.forEach(function (element) {
+        if (tmp) { return null }
+        if (element.piece.label) {
+            if ((x > element.piece.xpos && (x - element.piece.xpos <= element.piece.width + 100)) && (y > element.piece.ypos && (y - element.piece.ypos <= element.piece.height / 2))) {
                 tmp = element
             }
-
+        } else {
+            if ((x > element.piece.xpos) && (x < element.piece.xpos + (element.img.width / 10)) &&
+                (y > element.piece.ypos) && (y < element.piece.ypos + (element.img.height / 10))) {
+                tmp = element
+            }
+        }
     });
     return tmp;
 }
@@ -318,6 +341,7 @@ document.getElementById("delete").addEventListener("click", function() {
     deleting = true;
     moving = false;
 	isWire = false;
+    label = false
     document.getElementById('desc2').textContent = "Click a gate to delete it.";
 });
 //Move button
@@ -325,6 +349,7 @@ document.getElementById("move").addEventListener("click", function() {
     deleting = false;
 	isWire = false;
     moving = true;
+    label = false
     document.getElementById('desc2').textContent = "Click a gate to drag around.";
 });
 //Wire button
@@ -333,7 +358,18 @@ document.getElementById("wire").addEventListener("click", function() {
 	deleting = false;
 	moving = false;
 	tmp_gate= null;
+    label = false
     document.getElementById('desc2').textContent = "Click a gate to drag around.";
+});
+
+//Label Buttons
+document.getElementById("Label-gate").addEventListener("click", function () {
+    gate_btn_id = "Label-gate"
+    deleting = false;
+    moving = false;
+    isWire = false;
+    label = true
+    document.getElementById('desc2').textContent = "Click to add Label.";
 });
 
 //Gate Buttons
@@ -343,6 +379,7 @@ document.getElementById("and-gate").addEventListener("click", function() {
     deleting = false;
     moving = false;
 	isWire = false;
+    label = false
 	document.getElementById('desc2').textContent =  "Click to add AND Gate.";
 });
 document.getElementById("or-gate").addEventListener("click", function() {
@@ -351,6 +388,7 @@ document.getElementById("or-gate").addEventListener("click", function() {
     deleting = false;
     moving = false;
     isWire = false;
+    label = false
 	document.getElementById('desc2').textContent = "Click to add OR Gate.";
 });
 document.getElementById("not-gate").addEventListener("click", function() {
@@ -359,6 +397,7 @@ document.getElementById("not-gate").addEventListener("click", function() {
     deleting = false;
     moving = false;
 	isWire = false;
+    label = false
 	document.getElementById('desc2').textContent = "Click to add NOR Gate.";
 });
 document.getElementById("nand-gate").addEventListener("click", function() {
@@ -366,6 +405,7 @@ document.getElementById("nand-gate").addEventListener("click", function() {
     gate_btn_id = "nand-gate"
     moving = false;
     isWire = false;
+    label = false
 	document.getElementById('desc2').textContent = "Click to add NAND Gate.";
 });
 document.getElementById("nor-gate").addEventListener("click", function() {
@@ -374,6 +414,7 @@ document.getElementById("nor-gate").addEventListener("click", function() {
     deleting = false;
     moving = false;
 	isWire = false;
+    label = false
 	document.getElementById('desc2').textContent = "Click to add NOR Gate.";
 });
 document.getElementById("xnor-gate").addEventListener("click", function() {
@@ -381,6 +422,7 @@ document.getElementById("xnor-gate").addEventListener("click", function() {
     gate_btn_id = "xnor-gate"
     moving = false;
     isWire = false;
+    label = false
 	document.getElementById('desc2').textContent = "Click to add XNOR Gate.";
 });
 document.getElementById("xor-gate").addEventListener("click", function() {
@@ -389,6 +431,7 @@ document.getElementById("xor-gate").addEventListener("click", function() {
     deleting = false;
     moving = false;
     isWire = false;
+    label = false
 	document.getElementById('desc2').textContent = "Click to add XOR Gate.";
 });
 document.getElementById("5-and-gate").addEventListener("click", function() {
@@ -396,6 +439,7 @@ document.getElementById("5-and-gate").addEventListener("click", function() {
     gate_btn_id = "5-and-gate"
     moving = false;
 	isWire = false;
+    label = false
 	document.getElementById('desc2').textContent = "Click to add 5-input AND Gate.";
 });
 document.getElementById("5-or-gate").addEventListener("click", function() {
@@ -404,6 +448,7 @@ document.getElementById("5-or-gate").addEventListener("click", function() {
     deleting = false;
     moving = false;
     isWire = false;
+    label = false
 	document.getElementById('desc2').textContent = "Click to add 5-input OR Gate.";
 });
 document.getElementById("out-led").addEventListener("click", function() {
@@ -411,6 +456,7 @@ document.getElementById("out-led").addEventListener("click", function() {
     gate_btn_id = "out-led"
     moving = false;
 	isWire = false;
+    label = false
 	document.getElementById('desc2').textContent = "Click to add LED Output.";
 });
 document.getElementById("positive-input").addEventListener("click", function() {
@@ -419,6 +465,7 @@ document.getElementById("positive-input").addEventListener("click", function() {
     deleting = false;
     moving = false;
     isWire = false;
+    label = false
 	document.getElementById('desc2').textContent = "Click to add Positive Input.";
 });
 document.getElementById("zero-input").addEventListener("click", function() {
@@ -427,6 +474,7 @@ document.getElementById("zero-input").addEventListener("click", function() {
     deleting = false;
     moving = false;
 	isWire = false;
+    label = false
 	document.getElementById('desc2').textContent = "Click to add Zero Input.";
 });
 /*
@@ -469,34 +517,45 @@ document.getElementById("zero-input").addEventListener("click", function() {
 document.getElementById("gates").addEventListener("mousedown", function(e) {
     var x = (e.offsetX) - (e.offsetX%10);
     var y = (e.offsetY) - (e.offsetY%10);
-    if(deleting){
-        tmp_gate = checkClick(x,y)
-	    if(tmp_gate != null){
-	        nodes.delete(tmp_gate)
-	        tmp_gate = null
-        }
-        if(play_pressed){
-            play();
-        }
-    }
-    else if(moving){
-        tmp_gate = checkClick(x,y)
-        if(tmp_gate != null){
-            //fucntion to be used by listeners
-            var moveTo = function(e){
-                x = (e.offsetX) - (e.offsetX%10);
-                y = (e.offsetY) - (e.offsetY%10);
-                tmp_gate.piece.setLocation(x,y);
-                connectionCheck();
-                if(play_pressed){
-                    play();
-                }
-                drawGates();
+    if (label == true) {
+        var name = prompt("input table"); //将输入的内容赋给变量 name ， 
+        if (name) {
+            tmp_gate = new CircuitNodeView(new Labels(name));
+            document.getElementById(gate_btn_id).click(); //used to make new gate instance
+            tmp_gate.piece.setLocation(x, y);
+            nodes.add(tmp_gate);
+            if (play_pressed) {
+                play();
             }
-            document.getElementById("gates").addEventListener("mousemove", moveTo);
-            document.getElementById("gates").addEventListener("mouseup", function(){
-                document.getElementById("gates").removeEventListener("mousemove",moveTo);
-            });
+        }
+    } else {
+        if (deleting) {
+            tmp_gate = checkClick(x, y)
+            if (tmp_gate != null) {
+                nodes.delete(tmp_gate)
+                tmp_gate = null
+            }
+            if (play_pressed) {
+                play();
+            }
+        } else if (moving) {
+            tmp_gate = checkClick(x, y)
+            if (tmp_gate != null) {
+                //fucntion to be used by listeners
+                var moveTo = function (e) {
+                    x = (e.offsetX) - (e.offsetX % 10);
+                    y = (e.offsetY) - (e.offsetY % 10);
+                    tmp_gate.piece.setLocation(x, y);
+                    connectionCheck();
+                    if (play_pressed) {
+                        play();
+                    }
+                    drawGates();
+                }
+                document.getElementById("gates").addEventListener("mousemove", moveTo);
+                document.getElementById("gates").addEventListener("mouseup", function () {
+                    document.getElementById("gates").removeEventListener("mousemove", moveTo);
+                });
             
 
         }
@@ -531,6 +590,7 @@ document.getElementById("gates").addEventListener("mousedown", function(e) {
         });
 		wires.add(tmp_wire);
     }
+}
     connectionCheck();
     drawGates();
 });

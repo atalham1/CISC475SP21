@@ -93,4 +93,10 @@ img {
 	width: 68px;
 }
 
+.divs {
+    position: absolute;
+    z-index: 1111;
+    cursor: pointer;
+}
+
 

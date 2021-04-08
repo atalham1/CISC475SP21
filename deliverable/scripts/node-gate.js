@@ -130,8 +130,17 @@ class AndGate extends CircuitPiece{
 			this.output = 1;
 			this.img_path = "images/10x6_and_on_both.png"
 		}
+		else if (this.input[0] == 1 && this.input[1] == 0) {
+			this.output = 0;
+			this.img_path = "images/10x6_and_on_top.png"
+		}
+		else if (this.input[0] == 0 && this.input[1] == 1) {
+			this.output = 0;
+			this.img_path = "images/10x6_and_on_bot.png"
+		}
 		else{
 			this.output = 0;
+			this.img_path = "images/10x6_and.png";
 		}
 	}
 	reset(){
@@ -193,11 +202,21 @@ class NandGate extends CircuitPiece{
 	}
 	getOutput(){
 		if (this.input[0] == 1 && this.input[1] == 1) {
-            this.output = 0;
-        }
-        else {
-            this.output = 1;
-        }
+			this.output = 0;
+			this.img_path = "images/11x6_nand_on_both.png";
+		}
+		else if (this.input[0] == 1) {
+			this.output = 1;
+			this.img_path = "images/11x6_nand_on_top.png";
+		}
+        else if (this.input[1] == 1){
+			this.output = 1;
+			this.img_path = "images/11x6_nand_on_bot.png";
+		}
+		else {
+			this.output = 1;
+			this.img_path = "images/11x6_nand_off.png";
+		}
 	}
 	reset(){
 		this.input = [0,0];
@@ -244,12 +263,22 @@ class XorGate extends CircuitPiece{
 		this.img_path = "images/10x6_xor.png";
 	}
 	getOutput(){
-		if (this.input[0] != this.input[1]) {
-            this.output = 1;
-        }
-        else {
-            this.output = 0;
-        }
+		if (this.input[0] == 1 && this.input[1] == 1) {
+			this.output = 0;
+			this.img_path = "images/10x6_xor_on_both.png";
+		}
+		else if (this.input[0] == 1) {
+			this.output = 1;
+			this.img_path = "images/10x6_xor_on_top.png";
+		}
+        else if (this.input[1] == 1){
+			this.output = 1;
+			this.img_path = "images/10x6_xor_on_bot.png";
+		}
+		else {
+			this.output = 0;
+			this.img_path = "images/10x6_xor.png";
+		}
 	}
 	reset(){
 		this.input = [0,0];
@@ -274,12 +303,22 @@ class NorGate extends CircuitPiece{
 		this.outputLocations=[x+100,y+30];
 	}
 	getOutput(){
-		if (this.input[0] == 0 && this.input[1] == 0) {
-            this.output = 1;
-        }
-        else {
-            this.output = 0;
-        }
+		if (this.input[0] == 1 && this.input[1] == 1) {
+			this.output = 0;
+			this.img_path = "images/11x6_nor_on_both.png";
+		}
+		else if (this.input[0] == 1) {
+			this.output = 0;
+			this.img_path = "images/11x6_nor_on_top.png";
+		}
+        else if (this.input[1] == 1){
+			this.output = 0;
+			this.img_path = "images/11x6_nor_on_bot.png";
+		}
+		else {
+			this.output = 1;
+			this.img_path = "images/11x6_nor_off.png";
+		}
 	}
 	reset(){
 		this.input = [0,0];
@@ -304,12 +343,22 @@ class XnorGate extends CircuitPiece{
 		this.outputLocations=[x+100,y+30];
 	}
 	getOutput(){
-		if (this.input[0] == this.input[1]) {
-            this.output = 1;
-        }
-        else {
-            this.output = 0;
-        }
+		if (this.input[0] == 1 && this.input[1] == 1) {
+			this.output = 1;
+			this.img_path = "images/11x6_xnor_on_both.png";
+		}
+		else if (this.input[0] == 1) {
+			this.output = 0;
+			this.img_path = "images/11x6_xnor_on_top.png";
+		}
+        else if (this.input[1] == 1){
+			this.output = 0;
+			this.img_path = "images/11x6_xnor_on_bot.png";
+		}
+		else {
+			this.output = 1;
+			this.img_path = "images/11x6_xnor_off.png";
+		}
 	}
 	reset(){
 		this.input = [0,0];

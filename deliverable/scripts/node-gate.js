@@ -22,11 +22,24 @@ class CircuitNode {
 		this.img = new Image();
 		this.piece = piece;
 		this.img.src = piece.img_path;
+		this.moving = false;
 	}
 
 	getInput() {
         for (let i = 0; i < this.parent.length; i++) {
-            this.piece.input[this.parent[i][1]] = this.parent[i][0].piece.output;
+			var index = this.parent[i][1];
+			if (this.piece.type == "ledOut") {
+				index = 0;
+				console.log(this.piece.type);
+				console.log(this.parent[i][0].piece.output);
+			}
+
+			if (this.piece.type == "notGate") {
+				console.log(this.piece.type);
+				console.log(this.piece.output);
+			}
+            this.piece.input[index] = this.parent[i][0].piece.output;
+
 		}
 	}
 }
@@ -124,14 +137,25 @@ class AndGate extends CircuitPiece{
 		this.input = [0,0];
 		this.output = 0;
 		this.img_path = "images/10x6_and.png";
+		this.img_default = "images/10x6_and.png";
+		this.type = "andGate";
 	}
 	getOutput(){
 		if(this.input[0] == 1 && this.input[1] == 1){
 			this.output = 1;
 			this.img_path = "images/10x6_and_on_both.png"
 		}
+		else if (this.input[0] == 1 && this.input[1] == 0) {
+			this.output = 0;
+			this.img_path = "images/10x6_and_on_top.png"
+		}
+		else if (this.input[0] == 0 && this.input[1] == 1) {
+			this.output = 0;
+			this.img_path = "images/10x6_and_on_bot.png"
+		}
 		else{
 			this.output = 0;
+			this.img_path = "images/10x6_and.png";
 		}
 	}
 	reset(){
@@ -146,6 +170,7 @@ class Labels extends CircuitPiece {
 		this.input = [0, 0];
 		this.output = 1;
 		this.label = props
+		this.type = "label";
 		// this.props = props
 	}
 	setLocation(x, y) {
@@ -180,6 +205,8 @@ class NandGate extends CircuitPiece{
 		this.input = [0,0];
 		this.output = 1;
 		this.img_path = "images/11x6_nand.png";
+		this.img_default = "images/11x6_nand.png";
+		this.type = "nandGate";
 	}
 	
 	setLocation(x,y){
@@ -193,11 +220,21 @@ class NandGate extends CircuitPiece{
 	}
 	getOutput(){
 		if (this.input[0] == 1 && this.input[1] == 1) {
-            this.output = 0;
-        }
-        else {
-            this.output = 1;
-        }
+			this.output = 0;
+			this.img_path = "images/11x6_nand_on_both.png";
+		}
+		else if (this.input[0] == 1) {
+			this.output = 1;
+			this.img_path = "images/11x6_nand_on_top.png";
+		}
+        else if (this.input[1] == 1){
+			this.output = 1;
+			this.img_path = "images/11x6_nand_on_bot.png";
+		}
+		else {
+			this.output = 1;
+			this.img_path = "images/11x6_nand_off.png";
+		}
 	}
 	reset(){
 		this.input = [0,0];
@@ -211,6 +248,8 @@ class OrGate extends CircuitPiece{
 		this.input = [0,0];
 		this.output = 0;
 		this.img_path = "images/10x6_or.png";
+		this.img_default = "images/10x6_or.png";
+		this.type = "orGate";
 	}
 	getOutput(){
 		if (this.input[0] == 1 && this.input[1] == 1) {
@@ -242,14 +281,26 @@ class XorGate extends CircuitPiece{
 		this.input = [0,0];
 		this.output = 0;
 		this.img_path = "images/10x6_xor.png";
+		this.img_default = "images/10x6_xor.png";
+		this.type = "xorGate";
 	}
 	getOutput(){
-		if (this.input[0] != this.input[1]) {
-            this.output = 1;
-        }
-        else {
-            this.output = 0;
-        }
+		if (this.input[0] == 1 && this.input[1] == 1) {
+			this.output = 0;
+			this.img_path = "images/10x6_xor_on_both.png";
+		}
+		else if (this.input[0] == 1) {
+			this.output = 1;
+			this.img_path = "images/10x6_xor_on_top.png";
+		}
+        else if (this.input[1] == 1){
+			this.output = 1;
+			this.img_path = "images/10x6_xor_on_bot.png";
+		}
+		else {
+			this.output = 0;
+			this.img_path = "images/10x6_xor.png";
+		}
 	}
 	reset(){
 		this.input = [0,0];
@@ -263,6 +314,8 @@ class NorGate extends CircuitPiece{
 		this.input = [0,0];
 		this.output = 1;
 		this.img_path = "images/11x6_nor.png";
+		this.img_default = "images/11x6_nor.png";
+		this.type = "norGate";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -274,12 +327,22 @@ class NorGate extends CircuitPiece{
 		this.outputLocations=[x+100,y+30];
 	}
 	getOutput(){
-		if (this.input[0] == 0 && this.input[1] == 0) {
-            this.output = 1;
-        }
-        else {
-            this.output = 0;
-        }
+		if (this.input[0] == 1 && this.input[1] == 1) {
+			this.output = 0;
+			this.img_path = "images/11x6_nor_on_both.png";
+		}
+		else if (this.input[0] == 1) {
+			this.output = 0;
+			this.img_path = "images/11x6_nor_on_top.png";
+		}
+        else if (this.input[1] == 1){
+			this.output = 0;
+			this.img_path = "images/11x6_nor_on_bot.png";
+		}
+		else {
+			this.output = 1;
+			this.img_path = "images/11x6_nor_off.png";
+		}
 	}
 	reset(){
 		this.input = [0,0];
@@ -293,6 +356,8 @@ class XnorGate extends CircuitPiece{
 		this.input = [0,0];
 		this.output = 1;
 		this.img_path = "images/11x6_xnor.png";
+		this.img_default = "images/11x6_xnor.png";
+		this.type = "xnorGate";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -304,12 +369,22 @@ class XnorGate extends CircuitPiece{
 		this.outputLocations=[x+100,y+30];
 	}
 	getOutput(){
-		if (this.input[0] == this.input[1]) {
-            this.output = 1;
-        }
-        else {
-            this.output = 0;
-        }
+		if (this.input[0] == 1 && this.input[1] == 1) {
+			this.output = 1;
+			this.img_path = "images/11x6_xnor_on_both.png";
+		}
+		else if (this.input[0] == 1) {
+			this.output = 0;
+			this.img_path = "images/11x6_xnor_on_top.png";
+		}
+        else if (this.input[1] == 1){
+			this.output = 0;
+			this.img_path = "images/11x6_xnor_on_bot.png";
+		}
+		else {
+			this.output = 1;
+			this.img_path = "images/11x6_xnor_off.png";
+		}
 	}
 	reset(){
 		this.input = [0,0];
@@ -323,6 +398,8 @@ class NotGate extends CircuitPiece{
 		this.input = [0];
 		this.output = 1;
 		this.img_path = "images/10x6_not.png";
+		this.img_default = "images/10x6_not.png";
+		this.type = "notGate";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -353,7 +430,9 @@ class FiveAndGate extends CircuitPiece{
 		this.input = [0,0,0,0,0];
 		this.output = 0;
 		this.img_path = "images/10x6_5-input-and.png";
+		this.img_default = "images/10x6_5-input-and.png";
 		this.inputLocations=[[0,0,false],[0,0,false],[0,0,false],[0,0,false],[0,0,false]];
+		this.type = "fiveAndGate";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -391,7 +470,9 @@ class FiveOrGate extends CircuitPiece{
 		this.input = [0,0,0,0,0];
 		this.output = 0;
 		this.img_path = "images/10x6_5-input-or.png";
+		this.img_default = "images/10x6_5-input-or.png";
 		this.inputLocations = [[0,0,false],[0,0,false],[0,0,false],[0,0,false],[0,0,false]]
+		this.type = "fiveOrGate";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -429,7 +510,9 @@ class PositiveIn extends CircuitPiece{
 		this.input = null;
 		this.output = 1;
 		this.img_path = "images/7x6_positive.png";
-		this.inputLocations = []
+		this.img_default = "images/7x6_positive.png";
+		this.inputLocations = [];
+		this.type = "posInput";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -454,7 +537,9 @@ class NegativeIn extends CircuitPiece{
 		this.input = null;
 		this.output = 0;
 		this.img_path = "images/7x6_zero.png";
-		this.inputLocations = []
+		this.img_default = "images/7x6_zero.png";
+		this.inputLocations = [];
+		this.type = "negInput";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -472,7 +557,9 @@ class LEDout extends CircuitPiece{
 		this.input = [0];
 		this.output = 0;
 		this.img_path = "images/7x6_LED.png";
+		this.img_default = "images/7x6_LED.png";
 		this.inputLocations=[[0,0,false]];
+		this.type = "ledOut";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -520,7 +607,8 @@ class Button extends CircuitPiece{
 		this.input = [0];
 		this.output = 0;
 		//still need image
-		this.img_path = "" 
+		this.img_path = "";
+		this.type = "button";
 	}
 	getOutput(){
 		if(this.pressed && this.input[0] == 1){
@@ -547,6 +635,7 @@ class Switch extends CircuitPiece{
 		this.output = 0;
 		//still need image
 		this.img_path = "" 
+		this.type = "switch";
 	}
 	getOutput(){
 		if(this.closed && this.input[0] == 1){

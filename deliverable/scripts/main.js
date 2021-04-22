@@ -41,6 +41,10 @@ var moving = false;
 //boolean for delete button
 var deleting = false;
 
+//bool for clearing the board
+
+var clearing =false;
+
 //vars for wire button
 var isWire = false;
 var tmp_wire = null;
@@ -384,7 +388,13 @@ function Set_toJSON(key, value) {
         See more detailed comments down there
 
 */
-
+//clear button
+document.getElementById("clear").addEventListener("click", function() {
+    nodes.clear();
+    wires.clear();
+    drawGates();
+    document.getElementById('desc2').textContent = "Click a gate to clear all.";
+});
 //Control buttons
 document.getElementById("save_btn").addEventListener("click", function() {
     console.log(nodes);
@@ -567,9 +577,10 @@ document.getElementById("wire").addEventListener("click", function() {
 document.getElementById("Label-gate").addEventListener("click", function () {
     gate_btn_id = "Label-gate"
     deleting = false;
+    clearing = false;
     moving = false;
     isWire = false;
-    label = true
+    label = true;
     document.getElementById('desc2').textContent = "Click to add Label.";
 });
 
@@ -605,6 +616,7 @@ document.getElementById("nand-gate").addEventListener("click", function() {
     tmp_gate = new CircuitNode(new NandGate());
     gate_btn_id = "nand-gate"
     moving = false;
+    clearing = false;
     isWire = false;
     label = false
 	document.getElementById('desc2').textContent = "Click to add NAND Gate.";
@@ -613,6 +625,7 @@ document.getElementById("nor-gate").addEventListener("click", function() {
     tmp_gate = new CircuitNode(new NorGate());
     gate_btn_id = "nor-gate"
     deleting = false;
+    clearing = false;
     moving = false;
 	isWire = false;
     label = false
@@ -622,6 +635,7 @@ document.getElementById("xnor-gate").addEventListener("click", function() {
     tmp_gate = new CircuitNode(new XnorGate());
     gate_btn_id = "xnor-gate"
     moving = false;
+    clearing = false;
     isWire = false;
     label = false
 	document.getElementById('desc2').textContent = "Click to add XNOR Gate.";
@@ -734,6 +748,7 @@ document.getElementById("gates").addEventListener("mousedown", function (e) {
             tmp_gate = checkClick(x, y)
             if (tmp_gate != null) {
                 nodes.delete(tmp_gate)
+                //nodes.clear()
                 wires.delete(tmp_gate)
                 tmp_gate = null
             }

@@ -26,7 +26,12 @@ class CircuitNode {
 
 	getInput() {
         for (let i = 0; i < this.parent.length; i++) {
-            this.piece.input[this.parent[i][1]] = this.parent[i][0].piece.output;
+			if (this.parent[i][0] instanceof Wire) {
+				//wire input -- parent instance of wire then
+				this.piece.input[this.parent[i][1]] = this.parent[i][0].output;
+			} else {
+				this.piece.input[this.parent[i][1]] = this.parent[i][0].piece.output;
+			}
 		}
 	}
 }
@@ -83,7 +88,7 @@ class CircuitPiece{
 		this.ypos = 0;
 		this.name = null;
 		this.inputLocations=[[0,0,false],[0,0,false]];
-		this.ouputLocations=[0,0];
+		this.outputLocations=[0,0];
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -395,6 +400,77 @@ class NotGate extends CircuitPiece{
 		this.output = 1
 	}
 }
+//SWITCH CLASS
+class Switch extends CircuitPiece{
+	constructor() {
+		super();
+		this.input = [0];
+		this.output = 0;
+		this.toggled = 0;
+		this.img_path = "images/switch-open-0-0.png";
+	}
+	toggle() {
+		this.toggled = this.toggled+1;
+		if (this.toggled == 2) {
+			this.toggled = 0;
+		}
+		//alert (this.toggled);
+	}
+	setLocation(x,y){
+		this.xpos = x;
+		this.ypos = y;
+		this.inputLocations[0][0] = x+10
+		this.inputLocations[0][1] = y+30
+		this.outputLocations=[x+90,y+30];
+	}
+	getOutput(){
+		if(this.toggled == 0) { // switch is not on (not toggled)
+			//alert("i'm not toggled");
+			if(this.input[0] == 0 && this.output == 0) {
+				this.img_path = "images/switch-open-0-0.png";
+			} else if(this.input[0] == 0 && this.output == 1) {
+				this.img_path = "images/switch-open-0-1.png";
+			} else if(this.input[0] == 1 && this.output == 0) {
+				this.img_path = "images/switch-open-1-0.png";
+			} else if(this.input[0] == 1 && this.output == 1) {
+				this.img_path = "images/switch-open-1-1.png";
+			} else {
+				alert("weird switch behaviour 1");
+			}
+		} else if (this.toggled == 1) { // switch is on (toggled)
+			//alert("i'm toggled");
+			if(this.input[0] == 0 && this.output == 0) { 
+				this.img_path = "images/switch-close-0-0.png";
+			} else if(this.input[0] == 0 && this.output == 1) {
+				this.input[0] = 1;
+				this.img_path = "images/switch-close-1-1.png";
+			} else if(this.input[0] == 1 && this.output == 0) {
+				this.output = 1;
+				this.img_path = "images/switch-close-1-1.png";
+			} else if(this.input[0] == 1 && this.output == 1) {
+				this.img_path = "images/switch-close-1-1.png";
+			} else {
+				alert("weird switch behaviour 2");
+			}
+		} else {
+			alert("weird switch behaviour 3");
+		}
+		/*
+		if(this.input[0] == 0){
+			this.output = 1;
+			this.img_path = "images/10x6_not_off.png"
+		}
+		else {
+			this.output = 0;
+			this.img_path = "images/10x6_not_on.png"
+		}*/
+	}
+	reset(){
+		this.input = [0];
+		this.output = 0;
+		//this.img_path = "images/switch-open-0-0.png";
+	}
+}
 //FIVE AND GATE CLASS
 class FiveAndGate extends CircuitPiece{
 	constructor(){
@@ -530,6 +606,7 @@ class LEDout extends CircuitPiece{
 	}
 	getOutput(){
 		this.output = this.input[0];
+		console.log("getting LED" + this.output);
 		if (this.output == 1) {
 			this.img_path = "images/7x6_LED_on.png";
 		}
@@ -563,31 +640,12 @@ class LEDout extends CircuitPiece{
 
 //BUTTON CLASS
 class Button extends CircuitPiece{
-	constructor(){
-		super();
-		this.pressed = false;
-		this.input = [0];
-		this.output = 0;
-		//still need image
-		this.img_path = "" 
-	}
-	getOutput(){
-		if(this.pressed && this.input[0] == 1){
-			this.output = 1;
-		}
-		else {
-			this.output = 0;
-		}
-	}
-	reset(){
-		this.pressed = false;
-		this.input = [0];
-		this.output = 0;
-	}
+	// not used
 }
 
 //NOT IMPLEMENTED
 //SWITCH CLASS
+/*
 class Switch extends CircuitPiece{
 	constructor(){
 		super();
@@ -610,7 +668,7 @@ class Switch extends CircuitPiece{
 		this.input = [0];
 		this.output = 0;
 	}
-}
+}*/
 
 //NOT IMPLEMENTED
 //2 POLE SWITCH CLASS
@@ -660,12 +718,43 @@ class Wire {
 	constructor(){
 		this.left = null;
 		this.right = null;
+		this.output = 0;
+		this.playTurn = 0;
+		this.connectedWires = new Set();
+		this.connectedOutputs = new Set();
+		this.connectedInputs = new Set(); // stored as an array [gate, input number]
 	}
-
 	setLeft(x,y){
 		this.left = [x,y]
 	}
 	setRight(x,y){
 		this.right = [x,y]
+	}
+	getInput() {
+		if (this.playTurn == 1) {return;}
+		var conducting = 0;
+		for (let connOutput of this.connectedOutputs) {
+			if (connOutput.piece.output == 1) {this.output = 1;conducting = 1;}
+		}
+		//for (let connInput of this.connectedInputs) {
+		//	if (connInput[0].piece.input[connInput[1]] == 1) {this.output=1;conducting = 1;break;}
+		//}
+		if (this.playTurn == 0 || conducting == 0) {
+			this.playTurn = 1;
+			for (let connWire of this.connectedWires) {
+				if (this.output ==1) {
+					connWire.getInput();
+				}
+				if (connWire.output == 1) {
+					this.output=1;
+					conducting = 1;
+				}
+			}
+		}
+		if (conducting == 0) {this.output = 0;}
+	}
+	reset() {
+		this.playTurn = 0;
+		this.output = 0;
 	}
 }

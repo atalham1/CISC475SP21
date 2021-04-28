@@ -67,10 +67,14 @@ var label = false
 function play() {
     var led = null
     var i = 0;
-    nodes.forEach(function(element){
+	nodes.forEach(function(element){
         element.piece.reset()
     })
-    while (i < 2) {
+	wires.forEach(function(element){
+        element.reset()
+    })
+	connectionCheck();
+    while (i < 50) {
         nodes.forEach(function (element) {
             if(element.piece instanceof LEDout){
                 led = element
@@ -80,12 +84,20 @@ function play() {
         nodes.forEach(function (element) {
             element.piece.getOutput();
         });
+		wires.forEach(function(element){
+			element.reset()
+		});
+		wires.forEach(function (element) {
+			if(element.playTurn == 0) {
+				element.getInput();
+			}
+		});
         i++;
     }
-    
     console.log(nodes);
-
-    connectionCheck();
+	console.log(wires);
+	
+	
     drawGates();
 
     if(led != null){
@@ -110,7 +122,6 @@ function breakConnections(parentNode, childNode) {
             break;
         }
     }
-
 }
 
 
@@ -146,7 +157,6 @@ function connectionCheck(){
                     parent_input_idx = element2.parent[i][1]
                     break;
                 }
-
             }
             if
                 ((isParent) && ((element1.piece.outputLocations[0] != element2.piece.inputLocations[parent_input_idx][0]) ||
@@ -168,8 +178,81 @@ function connectionCheck(){
             }
         });
     });
-
-
+	
+	// remove all wire parents
+	nodes.forEach(function(element1){
+		for(let i=0; i<element1.parent.length; i++) {
+			if (element1.parent[i][0] instanceof Wire) {
+				element1.parent.splice(i,1);
+				i--;
+			}
+		}
+	})
+	
+	wires.forEach(function(wireElement){
+		//breaking connections
+		wireElement.connectedWires = new Set();
+		wireElement.connectedOutputs = new Set();
+		wireElement.connectedInputs = new Set();
+	});
+	
+	wires.forEach(function(wireElement){
+		
+		//making connections
+		var wirePoint1X = wireElement.left[0];
+		var wirePoint1Y = wireElement.left[1];
+		var wirePoint2X = wireElement.right[0];
+		var wirePoint2Y = wireElement.right[1];
+		
+		//connections with Wires
+		wires.forEach(function(wireComp) {
+			if (Object.is(wireElement,wireComp)== true){
+				
+			} else if(wireElement.connectedWires.has(wireComp)) {
+				
+			} else {
+			
+				var wireCompPoint1X = wireComp.left[0];
+				var wireCompPoint1Y = wireComp.left[1];
+				var wireCompPoint2X = wireComp.right[0];
+				var wireCompPoint2Y = wireComp.right[1];
+				
+				if ((wirePoint1X==wireCompPoint1X && wirePoint1Y==wireCompPoint1Y) ||
+						(wirePoint1X==wireCompPoint2X && wirePoint1Y==wireCompPoint2Y) ||
+						(wirePoint2X==wireCompPoint1X && wirePoint2Y==wireCompPoint1Y) ||
+						(wirePoint2X==wireCompPoint2X && wirePoint2Y==wireCompPoint2Y)) {
+							
+							wireElement.connectedWires.add(wireComp);
+							wireComp.connectedWires.add(wireElement);
+						}
+			}
+		});
+		
+		//connections with Nodes
+		nodes.forEach(function(element1){
+			// input
+			if (element1.piece.input==null){
+				
+			} else {
+				for(let i=0; i<element1.piece.input.length; i++) {
+					var element1InputX = element1.piece.inputLocations[i][0];
+					var element1InputY = element1.piece.inputLocations[i][1];
+					if ((wirePoint1X==element1InputX && wirePoint1Y==element1InputY) ||
+						(wirePoint2X==element1InputX && wirePoint2Y==element1InputY)) {
+							wireElement.connectedInputs.add([element1,i]);
+							element1.parent.push([wireElement,i]);
+						}
+				}
+			}
+			// output
+			var element1OutputX = element1.piece.outputLocations[0];
+			var element1OutputY = element1.piece.outputLocations[1];
+			if ((wirePoint1X==element1OutputX && wirePoint1Y==element1OutputY) ||
+					(wirePoint2X==element1OutputX && wirePoint2Y==element1OutputY)) {
+						wireElement.connectedOutputs.add(element1);
+					}
+		});
+	});
 }
 
 /*Saving and reading
@@ -295,6 +378,11 @@ function drawGates() {
     ctx.beginPath();
     ctx.restore()
     wires.forEach(function(element){
+		ctx.beginPath();
+		ctx.strokeStyle='#000000';
+		if (element.output == 1) {
+			ctx.strokeStyle='#FF0000';
+		}
         ctx.moveTo(element.left[0], element.left[1]);
         ctx.arc(element.left[0], element.left[1], 5, 0, 2*Math.PI)
         ctx.arc(element.right[0], element.right[1], 5, -Math.PI,Math.PI)
@@ -566,6 +654,15 @@ document.getElementById("zero-input").addEventListener("click", function() {
     label = false
 	document.getElementById('desc2').textContent = "Click to add Zero Input.";
 });
+document.getElementById("switch").addEventListener("click", function() {
+    tmp_gate = new CircuitNode(new Switch());
+    gate_btn_id = "switch"
+    deleting = false;
+    moving = false;
+	isWire = false;
+    label = false
+	document.getElementById('desc2').textContent = "Click to add Switch.";
+});
 /*
     Clicking the grid: (holding the mouse down)
 
@@ -607,15 +704,12 @@ document.getElementById("gates").addEventListener("mousedown", function (e) {
     var x = (e.offsetX) - (e.offsetX % 10);
     var y = (e.offsetY) - (e.offsetY % 10);
     if (label == true) {
-        var name = prompt("Enter Label Text:"); //将输入的内容赋给变量 name ， 
+        var name = prompt("Enter Label Text:"); //Assign the entered content to the variable name 
         if (name) {
             tmp_gate = new CircuitNodeView(new Labels(name));
             document.getElementById(gate_btn_id).click(); //used to make new gate instance
             tmp_gate.piece.setLocation(x, y);
             nodes.add(tmp_gate);
-            if (play_pressed) {
-                play();
-            }
         }
     } else {
         if (deleting) {
@@ -628,8 +722,12 @@ document.getElementById("gates").addEventListener("mousedown", function (e) {
             if (play_pressed) {
                 play();
             }
+		} else if (play_pressed && checkClick(x, y) != null && checkClick(x, y).piece instanceof Switch) {
+			tmp_gate = checkClick(x, y);
+			var tmp_gate_switch = checkClick(x, y).piece;
+			tmp_gate_switch.toggle();
+			play();
         } else if (moving) {
-
             tmp_gate = checkClick(x, y)
             if (tmp_gate != null) {
                 var moveTo
@@ -650,7 +748,7 @@ document.getElementById("gates").addEventListener("mousedown", function (e) {
                             if (play_pressed) {
                                 play();
                             }
-                            drawGates();
+							drawGates();
                         }
                     } else {
                         moveTo = function (e) {
@@ -663,11 +761,11 @@ document.getElementById("gates").addEventListener("mousedown", function (e) {
                                 y = (e.offsetY) - (e.offsetY % 10);
                                 tmp_gate.setRight(x, y);
                             }
-                            connectionCheck();
+                            //connectionCheck();
                             if (play_pressed) {
                                 play();
                             }
-                            drawGates();
+							drawGates();
                         }
                     }
 
@@ -677,18 +775,18 @@ document.getElementById("gates").addEventListener("mousedown", function (e) {
                         x = (e.offsetX) - (e.offsetX % 10);
                         y = (e.offsetY) - (e.offsetY % 10);
                         tmp_gate.piece.setLocation(x, y);
-                        connectionCheck();
+                        //connectionCheck();
                         if (play_pressed) {
                             play();
                         }
-                        drawGates();
+						drawGates();
                     }
                 }
 
                 document.getElementById("gates").addEventListener("mousemove", moveTo);
                 document.getElementById("gates").addEventListener("mouseup", function () {
-                    console.log(99999)
-                    console.log(tmp_gate)
+                    //console.log(99999)
+                    //console.log(tmp_gate)
                     document.getElementById("gates").removeEventListener("mousemove", moveTo);
                 });
             }
@@ -713,8 +811,8 @@ document.getElementById("gates").addEventListener("mousedown", function (e) {
                 tmp_wire.setRight(x, y);
                 if (play_pressed) {
                     play();
-                }
-                drawGates();
+                } 
+				drawGates();
             }
 
             document.getElementById("gates").addEventListener("mousemove", moveTo);

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,3 +54,64 @@
 
 </body>
 </html> 
+=======
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="styles/style.css" type="text/css">
+    <title>Logic Gate Sim</title>
+</head>
+
+<body style="background:#f7cfa1">
+    <div id="heading">
+        <h1>Logic Gate Simulator</h1>
+        <h2>By Group 3</h2>
+    </div>
+    <div class="top-menu-bar">
+        <button type="button" id="load_btn">Load</button>
+        <button type="button" id="save_btn">Save</button>
+        <button type="button" id="play_btn" style="float:right">Play</button>
+        <button type="button" id="pause_btn" style="float:right">Pause</button>
+        <button type="button" id="stop_btn" style="float:right">Stop</button>
+    </div>
+    <div class="side-description">
+        <h2 id="desc1">Simulation is currently stopped. Click play above to start.</h2>
+        <h2 id="desc2">Choose a gate to place.</h2>
+    </div>
+    <div id="canvas">
+        <canvas id="grid" height="2000" width="2000"></canvas>
+        <canvas id="gates" height="2000" width="2000"></canvas>
+    </div>
+
+    <div class="bottom-menu-bar">
+        <button type="button" id="delete">DELETE</button>
+        <button type="button" id="move">MOVE</button>
+        <button type="button" id="wire">WIRE</button>
+        <button type="button" id="label-gate">Label</button>
+        <button type="button" id="and-gate"> <img src="images/and-gate.png"> </button>
+        <button type="button" id="or-gate"> <img src="images/or-gate.png"> </button>
+        <button type="button" id="not-gate"> <img src="images/not-gate.png"> </button>
+        <button type="button" id="nand-gate"> <img src="images/nand-gate.png"> </button>
+        <button type="button" id="nor-gate"> <img src="images/nor-gate.png"> </button>
+        <button type="button" id="xor-gate"> <img src="images/xor-gate.png"> </button>
+        <button type="button" id="xnor-gate"> <img src="images/xnor-gate.png"> </button>
+        <button type="button" id="5-and-gate"> <img src="images/5-and-gate.png"> </button>
+        <button type="button" id="5-or-gate"> <img src="images/5-or-gate.png"> </button>
+        <button type="button" id="positive-input"> <img src="images/positive-in.png"> </button>
+        <button type="button" id="zero-input"> <img src="images/zero-in.png"> </button>
+        <button type="button" id="out-led"> <img src="images/output-led.png"> </button>
+    </div>
+
+
+    <script src="scripts/grid.js"></script>
+    <!--GRID DRAWN-->
+    <script src="scripts/node-gate.js"></script>
+    <!--NODE-GATE CLASSES LOADED-->
+    <script src="scripts/main.js"></script>
+    <!--MAIN VARIABLES AND FUNCTIONS LOADED-->
+
+</body>
+
+</html>
+>>>>>>> c1b1a2b82f1b24ccdb85def11efcd4fb9c099292

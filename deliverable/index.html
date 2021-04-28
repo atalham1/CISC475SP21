@@ -10,32 +10,26 @@
 		<h1>Logic Gate Simulator</h1>
 	</div>
 	<div class="top-menu-bar">
-		<button type="button" class="funcBtn" id="save_btn">Save</button>
+		<input type="file" id="selectFiles" value="Import" />
 		<button type="file" class="funcBtn" id="load_btn">Load</button>
-		<input type="file" id="selectFiles" value="Import" />	
+		<button type="button" class="funcBtn" id="save_btn">Save</button>
 		<button type="button" class="funcBtn" id="stop_btn" style="float:right">Stop</button>
+		<button type="button" class="funcBtn" id="pause_btn" style="float:right">Pause</button>
 		<button type="button" class="funcBtn" id="play_btn" style="float:right">Play</button>
 	</div>
 	<div class="side-description">
 		<h4 id="desc1">Simulation is currently stopped. Click play above to start.</h4>
 		<h4 id="desc2">Choose a gate to place.</h4>
 	</div>
-	<div class="side-description-right">
-		<h5 id="">Upload truth table to check against:</h5>
-		<input type="file" id="truthTableFiles" />
-		<table id=truthTable class="tTable"></table>
-	</div>
 	<div id="canvas">
 		<canvas id="grid" height="2000" width="2000"></canvas>
 		<canvas id="gates" height="2000" width="2000"></canvas>
 	</div>
-
 	
 	<div class="bottom-menu-bar">
 		<button type="button" class="funcBtn" id="delete">Delete</button>
 		<button type="button" class="funcBtn" id="move">Move</button>
 		<button type="button" class="funcBtn" id="wire">Wire</button>
-		<button type="button" class="funcBtn" id="clear">Clear</button>
 		<button type="button" class="funcBtn" id="Label-gate">Label</button>
 		<button type="button" id="and-gate"> <img src="images/and-gate.png"> </button>
 		<button type="button" id="or-gate"> <img src="images/or-gate.png"> </button>
@@ -51,11 +45,11 @@
 		<button type="button" id="out-led"> <img src="images/output-led.png"> </button>
 	</div>
 
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
 	<script src="scripts/grid.js"></script><!--GRID DRAWN-->
 	<script src="scripts/node-gate.js"></script><!--NODE-GATE CLASSES LOADED-->
 	<script src="scripts/main.js"></script><!--MAIN VARIABLES AND FUNCTIONS LOADED-->
-	
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 
 </body>
 </html> 

@@ -16,7 +16,6 @@ var wires = new Set();
 //tmp to hold current selected gate
 var tmp_gate = null;
 var touch = false;
-var interval;
 
 
 /*
@@ -40,10 +39,6 @@ var moving = false;
 
 //boolean for delete button
 var deleting = false;
-
-//bool for clearing the board
-
-var clearing =false;
 
 //vars for wire button
 var isWire = false;
@@ -72,40 +67,42 @@ var label = false
 function play() {
     var led = null
     var i = 0;
-    nodes.forEach(function(element){
+	nodes.forEach(function(element){
         element.piece.reset()
     })
-    while (i < 2) {
+	wires.forEach(function(element){
+        element.reset()
+    })
+	connectionCheck();
+    while (i < 50) {
         nodes.forEach(function (element) {
             if(element.piece instanceof LEDout){
-                //element.piece.getOutput();
-                led = element;
+                led = element
             }
             element.getInput();
+        });
+        nodes.forEach(function (element) {
             element.piece.getOutput();
         });
-        // nodes.forEach(function (element) {
-        //     element.piece.getOutput();
-        // });
+		wires.forEach(function(element){
+			element.reset()
+		});
+		wires.forEach(function (element) {
+			if(element.playTurn == 0) {
+				element.getInput();
+			}
+		});
         i++;
     }
-    
     console.log(nodes);
-
-    connectionCheck();
+	console.log(wires);
+	
+	
     drawGates();
 
     if(led != null){
         console.log(led.piece.output)
     }
-}
-
-function stop() {
-    nodes.forEach(function(element){
-        element.piece.reset()
-        element.piece.img_path = element.piece.img_default;
-    })
-    drawGates();
 }
 
 // MAKING & BREAKING CONNECTIONS
@@ -125,7 +122,6 @@ function breakConnections(parentNode, childNode) {
             break;
         }
     }
-
 }
 
 
@@ -161,7 +157,6 @@ function connectionCheck(){
                     parent_input_idx = element2.parent[i][1]
                     break;
                 }
-
             }
             if
                 ((isParent) && ((element1.piece.outputLocations[0] != element2.piece.inputLocations[parent_input_idx][0]) ||
@@ -183,8 +178,81 @@ function connectionCheck(){
             }
         });
     });
-
-
+	
+	// remove all wire parents
+	nodes.forEach(function(element1){
+		for(let i=0; i<element1.parent.length; i++) {
+			if (element1.parent[i][0] instanceof Wire) {
+				element1.parent.splice(i,1);
+				i--;
+			}
+		}
+	})
+	
+	wires.forEach(function(wireElement){
+		//breaking connections
+		wireElement.connectedWires = new Set();
+		wireElement.connectedOutputs = new Set();
+		wireElement.connectedInputs = new Set();
+	});
+	
+	wires.forEach(function(wireElement){
+		
+		//making connections
+		var wirePoint1X = wireElement.left[0];
+		var wirePoint1Y = wireElement.left[1];
+		var wirePoint2X = wireElement.right[0];
+		var wirePoint2Y = wireElement.right[1];
+		
+		//connections with Wires
+		wires.forEach(function(wireComp) {
+			if (Object.is(wireElement,wireComp)== true){
+				
+			} else if(wireElement.connectedWires.has(wireComp)) {
+				
+			} else {
+			
+				var wireCompPoint1X = wireComp.left[0];
+				var wireCompPoint1Y = wireComp.left[1];
+				var wireCompPoint2X = wireComp.right[0];
+				var wireCompPoint2Y = wireComp.right[1];
+				
+				if ((wirePoint1X==wireCompPoint1X && wirePoint1Y==wireCompPoint1Y) ||
+						(wirePoint1X==wireCompPoint2X && wirePoint1Y==wireCompPoint2Y) ||
+						(wirePoint2X==wireCompPoint1X && wirePoint2Y==wireCompPoint1Y) ||
+						(wirePoint2X==wireCompPoint2X && wirePoint2Y==wireCompPoint2Y)) {
+							
+							wireElement.connectedWires.add(wireComp);
+							wireComp.connectedWires.add(wireElement);
+						}
+			}
+		});
+		
+		//connections with Nodes
+		nodes.forEach(function(element1){
+			// input
+			if (element1.piece.input==null){
+				
+			} else {
+				for(let i=0; i<element1.piece.input.length; i++) {
+					var element1InputX = element1.piece.inputLocations[i][0];
+					var element1InputY = element1.piece.inputLocations[i][1];
+					if ((wirePoint1X==element1InputX && wirePoint1Y==element1InputY) ||
+						(wirePoint2X==element1InputX && wirePoint2Y==element1InputY)) {
+							wireElement.connectedInputs.add([element1,i]);
+							element1.parent.push([wireElement,i]);
+						}
+				}
+			}
+			// output
+			var element1OutputX = element1.piece.outputLocations[0];
+			var element1OutputY = element1.piece.outputLocations[1];
+			if ((wirePoint1X==element1OutputX && wirePoint1Y==element1OutputY) ||
+					(wirePoint2X==element1OutputX && wirePoint2Y==element1OutputY)) {
+						wireElement.connectedOutputs.add(element1);
+					}
+		});
+	});
 }
 
 /*Saving and reading
@@ -295,10 +363,14 @@ function drawGates() {
             else {
                 img2 = element.img;
             }
-            img2.onload=function() {
+            if (!play_pressed) {
                 ctx.drawImage(img2,element.piece.xpos,element.piece.ypos,element.img.width/10,element.img.height/10)
             }
-            
+            else {
+                img2.onload=function() {
+                    ctx.drawImage(img2,element.piece.xpos,element.piece.ypos,element.img.width/10,element.img.height/10)
+                }
+            }
         }
     });
 
@@ -306,15 +378,17 @@ function drawGates() {
     ctx.beginPath();
     ctx.restore()
     wires.forEach(function(element){
+		ctx.beginPath();
+		ctx.strokeStyle='#000000';
+		if (element.output == 1) {
+			ctx.strokeStyle='#FF0000';
+		}
         ctx.moveTo(element.left[0], element.left[1]);
         ctx.arc(element.left[0], element.left[1], 5, 0, 2*Math.PI)
         ctx.arc(element.right[0], element.right[1], 5, -Math.PI,Math.PI)
         ctx.stroke();
     })
 }
-
-
-
 
 /*  
     Check if position of mouse (x,y) is within the bounds of the image
@@ -326,13 +400,11 @@ function checkClick(x,y){
         if (tmp) { return null }
         if (element.piece.label) {
             if ((x > element.piece.xpos && (x - element.piece.xpos <= element.piece.width + 100)) && (y > element.piece.ypos && (y - element.piece.ypos <= element.piece.height / 2))) {
-                element.moving = true;
                 tmp = element
             }
         } else {
             if ((x > element.piece.xpos) && (x < element.piece.xpos + (element.img.width / 10)) &&
                 (y > element.piece.ypos) && (y < element.piece.ypos + (element.img.height / 10))) {
-                element.moving = true;
                 tmp = element
             }
         }
@@ -388,13 +460,7 @@ function Set_toJSON(key, value) {
         See more detailed comments down there
 
 */
-//clear button
-document.getElementById("clear").addEventListener("click", function() {
-    nodes.clear();
-    wires.clear();
-    drawGates();
-    document.getElementById('desc2').textContent = "Click a gate to clear all.";
-});
+
 //Control buttons
 document.getElementById("save_btn").addEventListener("click", function() {
     console.log(nodes);
@@ -402,8 +468,6 @@ document.getElementById("save_btn").addEventListener("click", function() {
     download(json, "test.json", "json");
 });
 document.getElementById("load_btn").addEventListener("click", function() {
-    document.getElementById('desc1').textContent = "Circuit is currently: STOPPED.";
-    play_pressed = false;
     var files = document.getElementById('selectFiles').files;
     console.log(files);
     if (files.length <= 0) {
@@ -411,81 +475,25 @@ document.getElementById("load_btn").addEventListener("click", function() {
     }
   
     var fr = new FileReader();
-    
   
     fr.onload = function(e) { 
         console.log(e);
         var result = JSON.parse(e.target.result);
         var formatted = JSON.stringify(result, null, 2);
         var setFormat = new Set();
-        console.log(result);
+        console.log(formatted);
         result.forEach(function( element) {
-            var piece;
-
-            switch(element.piece.type) {
-                case "andGate":
-                    piece = new AndGate();
-                    break;
-                case "label":
-                    piece = new Labels();
-                    break;
-                case "nandGate":
-                    piece = new NandGate();
-                    break;
-                case "orGate":
-                    piece = new OrGate();
-                    break;
-                case "xorGate":
-                    piece = new XorGate();
-                    break;
-                case "norGate":
-                    piece = new NorGate();
-                    break;
-                case "xnorGate":
-                    piece = new XnorGate();
-                    break;
-                case "notGate":
-                    piece = new NotGate();
-                    break;
-                case "fiveAndGate":
-                    piece = new FiveAndGate();
-                    break;
-                case "fiveOrGate":
-                    piece = new FiveOrGate();
-                    break;
-                case "posInput":
-                    piece = new PositiveIn();
-                    break;
-                case "negInput":
-                    piece = new NegativeIn();
-                    break;
-                case "ledOut":
-                    piece = new LEDout();
-                    break;
-                case "button":
-                    piece = new Button();
-                    break;
-                case "switch":
-                    piece = new Switch();
-                    break;
-                default:
-                    break;
-            } 
-
-            var x = Object.assign(piece, element.piece);
-            element.piece = x;
-
-            var circNode = new CircuitNode(element.piece);
-            circNode.parent = element.parent;
-
-            setFormat.add(circNode);
+            var circ = new CircuitNode();
+            circ = element;
+            setFormat.add(circ);
         });
-        nodes = setFormat;
-        stop();
-        drawGates();  
+        //nodes = new Set(result);
+        console.log(formatted);
+        
     }
   
     fr.readAsText(files.item(0));
+    //drawGates();
 });
 document.getElementById("play_btn").addEventListener("click", function() {
     document.getElementById('desc1').textContent = "Circuit is currently: PLAYING.";
@@ -493,10 +501,8 @@ document.getElementById("play_btn").addEventListener("click", function() {
     play();
 });
 document.getElementById("stop_btn").addEventListener("click", function() {
+    play_pressed = false
     document.getElementById('desc1').textContent = "Circuit is currently: STOPPED.";
-    play_pressed = false;
-    stop();
-    
 });
 /*
 PAUSE BUTTON NOT IMPLEMENTED
@@ -506,46 +512,6 @@ document.getElementById("pause_btn").addEventListener("click", function() {
     document.getElementById('desc1').textContent = "Circuit is currently: STOPPED.";
 });
 */
-var fileupload = $("#truthTableFiles");
-fileupload.on('change', function(){
-    var files = document.getElementById('truthTableFiles').files;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        var CSVARRAY = parseResult(e.target.result); //this is where the csv array will be
-        createTable(CSVARRAY);
-        //console.log(CSVARRAY);
-    };  
-    reader.readAsText(files.item(0));
-})
-
-function parseResult(result) {
-    var resultArray = [];
-    result.split("\n").forEach(function(row) {
-        var rowArray = [];
-        row.split(",").forEach(function(cell) {
-            rowArray.push(cell);
-        });
-        resultArray.push(rowArray);
-    });
-    return resultArray;
-}
-
-function createTable(arr) {
-    var content = "";
-    arr.forEach(function(row, j) {
-        content += "<tr>";
-        for (let i = 0; i < row.length; i++) {
-            if (j == 0) {
-                content += "<th>" + row[i] + "</th>" ;
-            }
-            else {
-                content += "<td>" + row[i] + "</td>" ;
-            }
-        };
-        content += "</tr>";
-    });
-    document.getElementById("truthTable").innerHTML = content;
-}
 
 // Delete button
 document.getElementById("delete").addEventListener("click", function() {
@@ -577,10 +543,9 @@ document.getElementById("wire").addEventListener("click", function() {
 document.getElementById("Label-gate").addEventListener("click", function () {
     gate_btn_id = "Label-gate"
     deleting = false;
-    clearing = false;
     moving = false;
     isWire = false;
-    label = true;
+    label = true
     document.getElementById('desc2').textContent = "Click to add Label.";
 });
 
@@ -616,7 +581,6 @@ document.getElementById("nand-gate").addEventListener("click", function() {
     tmp_gate = new CircuitNode(new NandGate());
     gate_btn_id = "nand-gate"
     moving = false;
-    clearing = false;
     isWire = false;
     label = false
 	document.getElementById('desc2').textContent = "Click to add NAND Gate.";
@@ -625,7 +589,6 @@ document.getElementById("nor-gate").addEventListener("click", function() {
     tmp_gate = new CircuitNode(new NorGate());
     gate_btn_id = "nor-gate"
     deleting = false;
-    clearing = false;
     moving = false;
 	isWire = false;
     label = false
@@ -635,7 +598,6 @@ document.getElementById("xnor-gate").addEventListener("click", function() {
     tmp_gate = new CircuitNode(new XnorGate());
     gate_btn_id = "xnor-gate"
     moving = false;
-    clearing = false;
     isWire = false;
     label = false
 	document.getElementById('desc2').textContent = "Click to add XNOR Gate.";
@@ -739,24 +701,24 @@ document.getElementById("gates").addEventListener("mousedown", function (e) {
             document.getElementById(gate_btn_id).click(); //used to make new gate instance
             tmp_gate.piece.setLocation(x, y);
             nodes.add(tmp_gate);
-            if (play_pressed) {
-                play();
-            }
         }
     } else {
         if (deleting) {
             tmp_gate = checkClick(x, y)
             if (tmp_gate != null) {
                 nodes.delete(tmp_gate)
-                //nodes.clear()
                 wires.delete(tmp_gate)
                 tmp_gate = null
             }
             if (play_pressed) {
                 play();
             }
+		} else if (play_pressed && checkClick(x, y) != null && checkClick(x, y).piece instanceof Switch) {
+			tmp_gate = checkClick(x, y);
+			var tmp_gate_switch = checkClick(x, y).piece;
+			tmp_gate_switch.toggle();
+			play();
         } else if (moving) {
-
             tmp_gate = checkClick(x, y)
             if (tmp_gate != null) {
                 var moveTo
@@ -777,14 +739,7 @@ document.getElementById("gates").addEventListener("mousedown", function (e) {
                             if (play_pressed) {
                                 play();
                             }
-                            
-                            if (interval != null) {
-                                clearInterval(interval);
-                            }
-                            interval = setInterval(function() {
-                                drawGates();
-                            }, 40);
-                            
+							drawGates();
                         }
                     } else {
                         moveTo = function (e) {
@@ -797,16 +752,11 @@ document.getElementById("gates").addEventListener("mousedown", function (e) {
                                 y = (e.offsetY) - (e.offsetY % 10);
                                 tmp_gate.setRight(x, y);
                             }
-                            connectionCheck();
+                            //connectionCheck();
                             if (play_pressed) {
                                 play();
                             }
-                            if (interval != null) {
-                                clearInterval(interval);
-                            }
-                            interval = setInterval(function() {
-                                drawGates();
-                            }, 40);
+							drawGates();
                         }
                     }
 
@@ -816,27 +766,18 @@ document.getElementById("gates").addEventListener("mousedown", function (e) {
                         x = (e.offsetX) - (e.offsetX % 10);
                         y = (e.offsetY) - (e.offsetY % 10);
                         tmp_gate.piece.setLocation(x, y);
-                        tmp_gate.moving = true;
-                        connectionCheck();
+                        //connectionCheck();
                         if (play_pressed) {
                             play();
                         }
-                        if (interval != null) {
-                            clearInterval(interval);
-                        }
-                        interval = setInterval(function() {
-                            drawGates();
-                        }, 40);
+						drawGates();
                     }
                 }
 
                 document.getElementById("gates").addEventListener("mousemove", moveTo);
                 document.getElementById("gates").addEventListener("mouseup", function () {
-                    console.log('test');
-                    clearInterval(interval);
-                    nodes.forEach(function(node) {
-                        node.moving = false;
-                    })
+                    //console.log(99999)
+                    //console.log(tmp_gate)
                     document.getElementById("gates").removeEventListener("mousemove", moveTo);
                 });
             }
@@ -861,17 +802,12 @@ document.getElementById("gates").addEventListener("mousedown", function (e) {
                 tmp_wire.setRight(x, y);
                 if (play_pressed) {
                     play();
-                }
-                drawGates();
+                } 
+				drawGates();
             }
 
             document.getElementById("gates").addEventListener("mousemove", moveTo);
             document.getElementById("gates").addEventListener("mouseup", function () {
-                console.log('test');
-                clearInterval(interval);
-                nodes.forEach(function(node) {
-                    node.moving = false;
-                })
                 document.getElementById("gates").removeEventListener("mousemove", moveTo);
             });
 

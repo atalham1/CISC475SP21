@@ -400,6 +400,79 @@ class NotGate extends CircuitPiece{
 		this.output = 1
 	}
 }
+//SWITCH CLASS
+class Switch extends CircuitPiece{
+	constructor() {
+		super();
+		this.input = [0];
+		this.output = 0;
+		this.toggled = 0;
+		this.img_path = "images/switch-open-0-0.png";
+		this.img_default = "images/switch-open-0-0.png";
+		this.type = "swtich";
+	}
+	toggle() {
+		this.toggled = this.toggled+1;
+		if (this.toggled == 2) {
+			this.toggled = 0;
+		}
+		//alert (this.toggled);
+	}
+	setLocation(x,y){
+		this.xpos = x;
+		this.ypos = y;
+		this.inputLocations[0][0] = x+10
+		this.inputLocations[0][1] = y+30
+		this.outputLocations=[x+90,y+30];
+	}
+	getOutput(){
+		if(this.toggled == 0) { // switch is not on (not toggled)
+			//alert("i'm not toggled");
+			if(this.input[0] == 0 && this.output == 0) {
+				this.img_path = "images/switch-open-0-0.png";
+			} else if(this.input[0] == 0 && this.output == 1) {
+				this.img_path = "images/switch-open-0-1.png";
+			} else if(this.input[0] == 1 && this.output == 0) {
+				this.img_path = "images/switch-open-1-0.png";
+			} else if(this.input[0] == 1 && this.output == 1) {
+				this.img_path = "images/switch-open-1-1.png";
+			} else {
+				alert("weird switch behaviour 1");
+			}
+		} else if (this.toggled == 1) { // switch is on (toggled)
+			//alert("i'm toggled");
+			if(this.input[0] == 0 && this.output == 0) { 
+				this.img_path = "images/switch-close-0-0.png";
+			} else if(this.input[0] == 0 && this.output == 1) {
+				this.input[0] = 1;
+				this.img_path = "images/switch-close-1-1.png";
+			} else if(this.input[0] == 1 && this.output == 0) {
+				this.output = 1;
+				this.img_path = "images/switch-close-1-1.png";
+			} else if(this.input[0] == 1 && this.output == 1) {
+				this.img_path = "images/switch-close-1-1.png";
+			} else {
+				alert("weird switch behaviour 2");
+			}
+		} else {
+			alert("weird switch behaviour 3");
+		}
+		/*
+		if(this.input[0] == 0){
+			this.output = 1;
+			this.img_path = "images/10x6_not_off.png"
+		}
+		else {
+			this.output = 0;
+			this.img_path = "images/10x6_not_on.png"
+		}*/
+	}
+	reset(){
+		this.input = [0];
+		this.output = 0;
+		//this.img_path = "images/switch-open-0-0.png";
+	}
+}
 //FIVE AND GATE CLASS
 class FiveAndGate extends CircuitPiece{
 	constructor(){
@@ -567,58 +640,6 @@ class LEDout extends CircuitPiece{
 
 	The 2 Pole Switch- is the only thing with 2 output locations. 
 */
-
-//BUTTON CLASS
-class Button extends CircuitPiece{
-	constructor(){
-		super();
-		this.pressed = false;
-		this.input = [0];
-		this.output = 0;
-		//still need image
-		this.img_path = "" 
-	}
-	getOutput(){
-		if(this.pressed && this.input[0] == 1){
-			this.output = 1;
-		}
-		else {
-			this.output = 0;
-		}
-	}
-	reset(){
-		this.pressed = false;
-		this.input = [0];
-		this.output = 0;
-	}
-}
-
-//NOT IMPLEMENTED
-//SWITCH CLASS
-class Switch extends CircuitPiece{
-	constructor(){
-		super();
-		this.closed = false;
-		this.input = [0];
-		this.output = 0;
-		//still need image
-		this.img_path = "" 
-	}
-	getOutput(){
-		if(this.closed && this.input[0] == 1){
-			this.output = 1;
-		}
-		else {
-			this.output = 0;
-		}
-	}
-	reset(){
-		this.closed = false;
-		this.input = [0];
-		this.output = 0;
-	}
-}
-
 //NOT IMPLEMENTED
 //2 POLE SWITCH CLASS
 class TwoPoleSwitch extends CircuitPiece{

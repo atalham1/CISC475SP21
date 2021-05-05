@@ -129,6 +129,8 @@ class AndGate extends CircuitPiece{
 		this.input = [0,0];
 		this.output = 0;
 		this.img_path = "images/10x6_and.png";
+		this.img_default = "images/10x6_and.png";
+		this.type = "andGate";
 	}
 	getOutput(){
 		if(this.input[0] == 1 && this.input[1] == 1){
@@ -159,7 +161,8 @@ class Labels extends CircuitPiece {
 		super(props);
 		this.input = [0, 0];
 		this.output = 1;
-		this.label = props
+		this.label = props;
+		this.type = "label";
 		// this.props = props
 	}
 	setLocation(x, y) {
@@ -194,6 +197,8 @@ class NandGate extends CircuitPiece{
 		this.input = [0,0];
 		this.output = 1;
 		this.img_path = "images/11x6_nand.png";
+		this.img_default = "images/11x6_nand.png";
+		this.type = "nandGate";
 	}
 	
 	setLocation(x,y){
@@ -235,6 +240,8 @@ class OrGate extends CircuitPiece{
 		this.input = [0,0];
 		this.output = 0;
 		this.img_path = "images/10x6_or.png";
+		this.img_default = "images/10x6_or.png";
+		this.type = "orGate";
 	}
 	getOutput(){
 		if (this.input[0] == 1 && this.input[1] == 1) {
@@ -266,6 +273,8 @@ class XorGate extends CircuitPiece{
 		this.input = [0,0];
 		this.output = 0;
 		this.img_path = "images/10x6_xor.png";
+		this.img_default = "images/10x6_xor.png";
+		this.type = "xorGate";
 	}
 	getOutput(){
 		if (this.input[0] == 1 && this.input[1] == 1) {
@@ -297,6 +306,8 @@ class NorGate extends CircuitPiece{
 		this.input = [0,0];
 		this.output = 1;
 		this.img_path = "images/11x6_nor.png";
+		this.img_default = "images/11x6_nor.png";
+		this.type = "norGate";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -337,6 +348,8 @@ class XnorGate extends CircuitPiece{
 		this.input = [0,0];
 		this.output = 1;
 		this.img_path = "images/11x6_xnor.png";
+		this.img_default = "images/11x6_xnor.png";
+		this.type = "xnorGate";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -377,6 +390,8 @@ class NotGate extends CircuitPiece{
 		this.input = [0];
 		this.output = 1;
 		this.img_path = "images/10x6_not.png";
+		this.img_default = "images/10x6_not.png";
+		this.type = "notGate";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -557,7 +572,9 @@ class PositiveIn extends CircuitPiece{
 		this.input = null;
 		this.output = 1;
 		this.img_path = "images/7x6_positive.png";
-		this.inputLocations = []
+		this.img_default = "images/7x6_positive.png";
+		this.inputLocations = [];
+		this.type = "posInput";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -582,7 +599,9 @@ class NegativeIn extends CircuitPiece{
 		this.input = null;
 		this.output = 0;
 		this.img_path = "images/7x6_zero.png";
-		this.inputLocations = []
+		this.img_default = "images/7x6_zero.png";
+		this.inputLocations = [];
+		this.type = "negInput";
 	}
 	setLocation(x,y){
 		this.xpos = x;
@@ -600,7 +619,9 @@ class LEDout extends CircuitPiece{
 		this.input = [0];
 		this.output = 0;
 		this.img_path = "images/7x6_LED.png";
+		this.img_default = "images/7x6_LED.png";
 		this.inputLocations=[[0,0,false]];
+		this.type = "ledOut";
 	}
 	setLocation(x,y){
 		this.xpos = x;

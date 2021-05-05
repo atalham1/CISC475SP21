@@ -624,48 +624,185 @@ function checkNodeInputsAndOutputs() {
 function createGradedArray() {
 
     var inputArray = new Set();
-
+    var nodesCopy = new Set();
+    var test = [];
     nodes.forEach(function(element) {
         if(element.piece instanceof PositiveIn || element.piece instanceof NegativeIn){
             inputArray.add(element);
-
+        }
+        else {
+            nodesCopy.add(element);
         }
     });
-    console.log(inputArray);
 
+    for (var i = 0; i < inputArray.size; i++) {
+        var x = String.fromCharCode(97 + i).toString();
+        test.push(x);
+    }
+
+    //console.log(inputArray);
+    //console.log(test);
+    var len = test.length
+    ,trueSet		
+    ,trues = []
+    ,falses = []
+    ,splitBy = Math.round(len/2);
+    
     var loopSize = Math.pow(2, inputArray.size);
 
     var outputArray = [];
+    var endArray = [];
+    outputArray.push(truth(test,test,true));
 
-    for(var i = 0; i < loopSize; i++) {
-        var arr = [];
-        for (var j= 0; j < inputArray.size; j++) {
-            arr.push(i);
-        }
-        outputArray.push(arr);
+	for(var i=1; i<=splitBy; i++) {
+		trueSet = reduceToCombinations(permut(test, i));
+		
+		trueSet.forEach((truthSrc)=>{
+			trues = truth(test, truthSrc);
+			outputArray.push(trues);
+		}); 
     }
+    outputArray.push(truth(test, test));
 
-    console.log(outputArray);
+
+    for (var i = 0; i < outputArray.length; i++) {
+        var merged = new Set([...nodesCopy, ...inputArray])
+
+        var index = 0;
+        var temp = [];
+
+        merged.forEach(function(element) {
+            if(element.piece instanceof PositiveIn || element.piece instanceof NegativeIn){
+                var x = String.fromCharCode(97 + index).toString();
+                x = x.toString();
+                element.piece.output = outputArray[i][x];
+                var o = {[x]: outputArray[i][x]}
+                temp.push(o);
+                index += 1;
+            }
+        });
+        var n = temp.concat(checkGates(merged));
+        endArray.push(n);
+    }
+    console.log(endArray);
+    console.log(truthTableArray);
+
+    compareGateAndTable(endArray)
 
 
 
 }
 
-function checkGates() {
-    var led = null
-    var i = 0;
-    nodes.forEach(function(element){
-        element.piece.reset()
-    })
-    wires.forEach(function(element){
-        element.reset()
-    })
+function compareGateAndTable(gateOutput) {
+    var tableCompareArray = [];
+    for (var i = 1; i < truthTableArray.length; i++) {
+        var temp = [];
+        for (var j = 0; j < truthTableArray[0].length; j++) {
+            if (truthTableArray[0][j] == truthTableArray[0][j].toUpperCase()) {
+                var o = parseInt(truthTableArray[i][j]);
+                temp.push(o);
+            }
+            else {
+                var head = truthTableArray[0][j];
+                var o = {[head]: parseInt(truthTableArray[i][j])};
+                temp.push(o);
+            }
 
+        }
+        tableCompareArray.push(temp);
+    }
+
+    console.log(gateOutput);
+    console.log(tableCompareArray);
+    var checkResult = true;
+    gateOutput.forEach(function(row) {
+        var res = compareOutput(row, tableCompareArray);
+        if (!res) {
+            checkResult = false;
+        }
+    });
+
+    if (checkResult) {
+        document.getElementById('checkText').style.color = '#32CD32';
+        document.getElementById('checkText').textContent = "PASSED";
+    }
+    else {
+        document.getElementById('checkText').style.color = '#FF0000';
+        document.getElementById('checkText').textContent = "FAILED";
+    }
     
+}
 
-    connectionCheck();
+function compareOutput(gateRow, table) {
+    var checkArray = [];
+    for (var i = 0; i < table.length; i++) {
+        if (gateRow[0]["a"] == table[i][0]["a"] && gateRow[1]["b"] == table[i][1]["b"] && gateRow[2]["c"] == table[i][2]["c"]) {
+            return gateRow[3] == table[i][3];
+        }
+    }
+}
+
+function truth(set, truths, reverse) {
+	var w = {};
+	
+	set.forEach(v=>w[v]=(truths.indexOf(v)>=0 ? true : false)^reverse);
+	
+	return w;
+}
+
+function reduceToCombinations(arr) {
+	var i=1
+		,lastEl;
+
+	arr = arr.map(v=>{return v.split('').sort().join('')}).sort();
+	
+	lastEl = arr[0];
+	while(i<arr.length) {
+		if(arr[i] == lastEl) {
+			arr.splice(i,1);
+		} else {
+			lastEl = arr[i];
+			i++;
+		}
+	}
+	
+	arr = arr.map(v=>{return v.split('')});
+	
+	return arr;
+}
+
+function permut(arr, c) {
+	var buf = []
+		,len
+		,arrSlice
+		,permArr
+		,proArr;
+	if(c<=1) {
+		return arr;
+	} else {
+		len = arr.length;
+		for(var i=0;i<len;i++) {
+			arrSlice = arr.slice(0,i).concat(arr.slice(i+1));
+			permArr = permut(arrSlice,c-1);
+			proArr = [];
+			for(var y=0; y<permArr.length; y++) {
+				proArr.push([arr[i]].concat(permArr[y]).join(''));
+			}
+			buf.push(...proArr);
+		}
+	}
+	return buf;
+}
+
+function checkGates(nodeList) {
+    var led = null
+    var i = 0; 
+
+    var outArray = [];
+
+    nodeList = new Set(connectionCheckForGrade(nodeList));
     while (i < 5) {
-        nodes.forEach(function (element) {
+        nodeList.forEach(function (element) {
             if(element.piece instanceof LEDout){
                 //element.piece.getOutput();
                 led = element;
@@ -673,16 +810,57 @@ function checkGates() {
             element.getInput();
             element.piece.getOutput();
         });
-		wires.forEach(function(element){
-			element.reset()
-		});
-		wires.forEach(function (element) {
-			if(element.playTurn == 0) {
-				element.getInput();
-			}
-		});
         i++;
     }
+
+    nodeList.forEach(function(element) {
+        if (element.piece instanceof LEDout) {
+            outArray.push(element.piece.output);
+        }
+    });
+
+    return outArray;
+
+}
+
+function connectionCheckForGrade(nodeList){
+    nodeList.forEach(function(element1){
+        if(element1.piece instanceof LEDout){ // LEDout class does not have outputLocations
+            return;
+        }
+        nodeList.forEach(function(element2){
+            //breaking connections
+            //check if parent and if not on the input, then break
+            var isParent = false;
+            var parent_input_idx = 0
+            for(let i=0;i<element2.parent.length;i++){
+                if(Object.is(element1,element2.parent[i][0]) == true){
+                    isParent=true;
+                    parent_input_idx = element2.parent[i][1]
+                    break;
+                }
+            };
+            if
+                ((isParent) && ((element1.piece.outputLocations[0] != element2.piece.inputLocations[parent_input_idx][0]) ||
+                    (element1.piece.outputLocations[1] != element2.piece.inputLocations[parent_input_idx][1])) &&
+                (element2.piece.inputLocations[parent_input_idx][2] == true)) {
+                element2.piece.inputLocations[parent_input_idx][2] = false
+                breakConnections(element1, element2)
+                return;
+            }
+            //making connections
+            //check if on each other, then connect
+            for(let i=0;i<element2.piece.inputLocations.length;i++){
+                if((element1.piece.outputLocations[0]==element2.piece.inputLocations[i][0]) &&
+                    (element1.piece.outputLocations[1]==element2.piece.inputLocations[i][1]) &&
+                    (element2.piece.inputLocations[i][2]==false)){
+                    element2.piece.inputLocations[i][2]=true;
+                    newConnection(element1,element2,i);
+                }
+            }
+        });
+    });
+    return nodeList;
 }
 
 /*

@@ -50,6 +50,12 @@ var isWire = false;
 var tmp_wire = null;
 var label = false
 var images = [];
+var truthTableArray = [];
+var totalGateInputs = 0;
+var totalGateOutputs = 0;
+
+var totalTableInputs = 0;
+var totalTableOutputs = 0;
 
 /*
    PLAY FUNCTION
@@ -578,6 +584,107 @@ document.getElementById("stop_btn").addEventListener("click", function() {
     stop();
     
 });
+document.getElementById("checkBtn").addEventListener("click", function() {
+    console.log(nodes);
+    console.log(truthTableArray);
+    checkNodeInputsAndOutputs();
+
+
+});
+
+function checkNodeInputsAndOutputs() {
+    nodes.forEach(function (element) {
+        if(element.piece instanceof PositiveIn || element.piece instanceof NegativeIn){
+            totalGateInputs += 1;
+
+        }
+        if(element.piece instanceof LEDout){
+            totalGateOutputs += 1;
+
+        }
+    });
+    console.log("gate inputs: " + totalGateInputs);
+    console.log("gate outputs: " + totalGateOutputs);
+
+    truthTableArray[0].forEach(function (header) {
+        if (header == header.toUpperCase()) {
+            totalTableOutputs += 1;
+        }
+        else if (header == header.toLowerCase()) {
+            totalTableInputs += 1;
+        }
+    });
+    console.log("table inputs: " + totalTableInputs);
+    console.log("table outputs: " + totalTableOutputs);
+
+    createGradedArray();
+
+};
+
+function createGradedArray() {
+
+    var inputArray = new Set();
+
+    nodes.forEach(function(element) {
+        if(element.piece instanceof PositiveIn || element.piece instanceof NegativeIn){
+            inputArray.add(element);
+
+        }
+    });
+    console.log(inputArray);
+
+    var loopSize = Math.pow(2, inputArray.size);
+
+    var outputArray = [];
+
+    for(var i = 0; i < loopSize; i++) {
+        var arr = [];
+        for (var j= 0; j < inputArray.size; j++) {
+            arr.push(i);
+        }
+        outputArray.push(arr);
+    }
+
+    console.log(outputArray);
+
+
+
+}
+
+function checkGates() {
+    var led = null
+    var i = 0;
+    nodes.forEach(function(element){
+        element.piece.reset()
+    })
+    wires.forEach(function(element){
+        element.reset()
+    })
+
+    
+
+    connectionCheck();
+    while (i < 5) {
+        nodes.forEach(function (element) {
+            if(element.piece instanceof LEDout){
+                //element.piece.getOutput();
+                led = element;
+            }
+            element.getInput();
+            element.piece.getOutput();
+        });
+		wires.forEach(function(element){
+			element.reset()
+		});
+		wires.forEach(function (element) {
+			if(element.playTurn == 0) {
+				element.getInput();
+			}
+		});
+        i++;
+    }
+}
+
 /*
 PAUSE BUTTON NOT IMPLEMENTED
 
@@ -592,8 +699,9 @@ fileupload.on('change', function(){
     var reader = new FileReader();
     reader.onload = function(e) {
         var CSVARRAY = parseResult(e.target.result); //this is where the csv array will be
+        truthTableArray = CSVARRAY;
         createTable(CSVARRAY);
-        //console.log(CSVARRAY);
+
     };  
     reader.readAsText(files.item(0));
 })

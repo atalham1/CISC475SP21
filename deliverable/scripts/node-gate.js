@@ -1,6 +1,10 @@
 /*
 	This file holds classes for the componenets of the circuit
 	and the Node class for storing them in a set
+
+	All circuit type pieces have a type that is used for converting a file upload to gate pieces,
+	an image_path that is changed as the circuit is playing, and an img_default that should not 
+	be changed and is used to store the base image name for the circuit piece.
 */
 
 /*
@@ -18,7 +22,7 @@
 
 class CircuitNode {
 	constructor(piece) {
-		this.parent = []; //each element holds [ parent_Node, input_index of child]
+		this.parent = []; //each element holds [parent_Node, input_index of child]
 		this.img = new Image();
 		this.piece = piece;
 		this.img.src = piece.img_path;
@@ -486,83 +490,6 @@ class Switch extends CircuitPiece{
 		this.input = [0];
 		this.output = 0;
 		//this.img_path = "images/switch-open-0-0.png";
-	}
-}
-//FIVE AND GATE CLASS
-class FiveAndGate extends CircuitPiece{
-	constructor(){
-		super();
-		this.input = [0,0,0,0,0];
-		this.output = 0;
-		this.img_path = "images/10x6_5-input-and.png";
-		this.inputLocations=[[0,0,false],[0,0,false],[0,0,false],[0,0,false],[0,0,false]];
-	}
-	setLocation(x,y){
-		this.xpos = x;
-		this.ypos = y;
-		this.inputLocations[0][0] = x+10
-		this.inputLocations[0][1] = y+10
-		this.inputLocations[1][0] = x+10
-		this.inputLocations[1][1] = y+20
-		this.inputLocations[2][0] = x+10
-		this.inputLocations[2][1] = y+30
-		this.inputLocations[3][0] = x+10
-		this.inputLocations[3][1] = y+40
-		this.inputLocations[4][0] = x+10
-		this.inputLocations[4][1] = y+50
-		this.outputLocations=[x+90,y+30];
-	}
-	getOutput(){
-		this.output = 1
-		for(let i = 0; i < this.input.length; i++){
-			if(this.input[i] == 0){
-				this.output = 0;
-				break;
-			}
-		}
-	}
-	reset(){
-		this.input = [0,0,0,0,0];
-		this.output = 0;
-	}
-}
-
-//FIVE OR GATE CLASS
-class FiveOrGate extends CircuitPiece{
-	constructor(){
-		super();
-		this.input = [0,0,0,0,0];
-		this.output = 0;
-		this.img_path = "images/10x6_5-input-or.png";
-		this.inputLocations = [[0,0,false],[0,0,false],[0,0,false],[0,0,false],[0,0,false]]
-	}
-	setLocation(x,y){
-		this.xpos = x;
-		this.ypos = y;
-		this.inputLocations[0][0] = x+10
-		this.inputLocations[0][1] = y+10
-		this.inputLocations[1][0] = x+10
-		this.inputLocations[1][1] = y+20
-		this.inputLocations[2][0] = x+10
-		this.inputLocations[2][1] = y+30
-		this.inputLocations[3][0] = x+10
-		this.inputLocations[3][1] = y+40
-		this.inputLocations[4][0] = x+10
-		this.inputLocations[4][1] = y+50
-		this.outputLocations=[x+90,y+30];
-	}
-	getOutput(){
-		this.output = 0
-		for(let i = 0; i < this.input.length; i++){
-			if(this.input[i] == 1){
-				this.output = 1;
-				break;
-			}
-		}
-	}
-	reset(){
-		this.input = [0,0,0,0,0];
-		this.output = 0;
 	}
 }
 //POSITIVE INPUT CLASS

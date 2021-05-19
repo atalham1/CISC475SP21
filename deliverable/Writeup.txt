@@ -1,6 +1,73 @@
 Logic Gate Simulator
 Write-up
 
+GENERAL OVERVIEW:
+	The original goal of this project was to create a circuit board simulator, similar to that of https://sciencedemos.org.uk/logic_gates.php, and then provide the ability
+	for some type of auto-grading of those circuits. We have pretty much completed the replication of the original site, and began to make some progress on the auto-grading.
+	All pieces should be currently working, you should be able to place them on the board, attach them to a positive/negative input, and an LED output. If you want to move
+	pieces currently, you have to select the move button first.The play functionality should be working, all pieces should change to red when powered, and black when not powered. 
+	The wire functionality should be working, but it needs a bit of touch-up to get the movement smoother. The label should be working, the clear board should be working, 
+	the move button should be working, the delete button should be working. The save and load buttons are currently half-working. They save the gate pieces, but not the 
+	wires. The truth-table autograder is also still under development. We worked through most of the backend process of converting the circuit that the user created to a format
+	that the truth table can be compared against. A lot of progress has been made in the backend, but the user experience needs quite a bit of work. Right now, the truth table must
+	be of a format that matches the csv files in the attached test_files folder, and we are using either positive/negative inputs to represent an input on the truth table, and 
+	LED outputs to represent outputs on the table. I will include a step-by-step process (found in test_files) that should allow you to get a PASSED check result, and from there you 
+	should be able to see what needs to be picked up on. Currently, the project is using canvas js for all the rendering of the pieces. It is what the last group decided to use, 
+	and gave us a number of difficulties because it is fairly out-dated. We were able to work through most of the difficulties and hopefully you guys are able to as well, 
+	but if have any problems feel free to contact me (atalham@udel.edu).
+
+OUTLINE OF CODE STRUCTURE:
+	- One HTML file, index.html, which loads all elements/scripts
+	- One CSS file, styles/style.css, which contains all CSS for index.html
+	- Scripts:
+		grid.js:
+			This file creates the "grid-paper" like look to the js canvas, unless you are changing the look of the grid itself this file
+			will probably remain unchanged.
+		grader.js:
+			This file contains all the functions that have to do with auto-grading. It is outlined more in depth in the file itself, but right now it
+			contains the basic functionality of comparing a circuit on the grid to a csv file representing a truth table
+		main.js:
+			This file contains quite a few different core pieces of code. All functions are commented with what purpose they serve, but the general things
+			that are done in the main function is as follows:
+				- functionality for all buttons (Save, Load, Play, Stop, Delete, Move, Wire, Clear, Label, Check, All Gates)
+				- functions that check connections between circuit pieces as well as wires
+				- functions that add the circuit piece/wire/label to the board, and the ability to move them
+				- functions that change the text of the left box that is indicates what is currently being done
+		node-gate.js:
+			This file contains the classes that are object representations of the various circuit pieces
+
+NEXT STEPS:
+	Here are some of the things we planned to work on more, and the next steps that should get you guys started:
+	1. Clean up some of the piece/wire movement:
+		- dragging wires/pieces can be a little glitchy at times
+		- if two pieces are attached to each other, and the user is dragging on that connection point, they should move together
+		- if a piece is attached to a wire, the end of the wire that is attached to that piece should be moved, while the other end stays
+	2. Add wires to the Save/Load functionality:
+		- Currently, only the Node Set in main.js which contains the gate pieces, but not the wires, is only being saved/loaded. The main wire set should also
+		  be saved/loaded.
+		- One way to do this would maybe be to create JSON's for the node set, then wire set, then combine them together with some indicator of where the separation
+		  of the two JSON's is
+	3. Auto-Grading:
+		- This is where the bulk of the work is going to be
+		- Wires are not currently working with auto-grading
+			- the connection check in the grader.js needs to be updated to include wires
+		- Instead of using Positive/Negative Inputs to represent an input, maybe have some new piece that auto-label's itself (ie. first is a, second is b...)
+		- Create some page for creating truth tables.
+			- This will ensure the files are of the proper format
+			- feel free to change the way inputs/outputs are determined in the truth tables... right now it is just a lowercase represents input, while uppercase is output
+		- Right now the headers for the input have to be 'a', then 'b', then 'c'... etc. I would make the inputs user driven or something less hard-coded
+		- Right now the auto-grader converts whatever circuit is on the board properly to a format usable for comparison, but will only compare to the truth table properly 
+		if the circuit is 3 inputs. This obviously needs to be updated to allow any number of inputs/outputs.
+		- Highlight the rows that are incorrect in the truth table. Currently, it just does a general pass/fail, but Dr. Roosen would like the rows that failed to be highlighted.
+		- The inputs/outputs are not very well and clearly determined right now. The first positive/negative input will be 'a', 2nd will be 'b', etc... This should be 
+		  more clear to the user.
+
+
+
+
+***THIS IS THE WRITEUP THAT WE GOT FROM THE PREVIOUS GROUP IN CASE IT IS HELPFUL, BUT IT IS NOT UP TO DATE IN TERMS OF WHAT IS WORKING/NOT WORKING:***
+
+
 Part I - What is working
     On the web-page:
         play button (play functionality limited; see code comments)
